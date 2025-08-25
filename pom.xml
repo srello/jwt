@@ -37,6 +37,10 @@
 		<nimbus.version>10.4</nimbus.version>
 		<tink.version>1.18.0</tink.version>
 		<guava.version>33.4.6-jre</guava.version>
+		<junit.version>5.13.4</junit.version>
+		<podam.version>8.0.2.RELEASE</podam.version>
+		<datafaker.version>2.4.2</datafaker.version>
+		<spring-web.version>4.0.0-M1</spring-web.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -50,6 +54,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${spring-web.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -67,16 +72,7 @@
 			<artifactId>spring-boot-configuration-processor</artifactId>
 			<optional>true</optional>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-test</artifactId>
-			<scope>test</scope>
-		</dependency>
+
 
 		<!-- Lombok -->
 		<dependency>
@@ -121,6 +117,30 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>${guava.version}</version>
+		</dependency>
+
+		<!-- test-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.datafaker</groupId>
+			<artifactId>datafaker</artifactId>
+			<version>${datafaker.version}</version>
+		</dependency>
+		<!-- PODAM https://mvnrepository.com/artifact/uk.co.jemos.podam/podam -->
+		<dependency>
+			<groupId>uk.co.jemos.podam</groupId>
+			<artifactId>podam</artifactId>
+			<version>${podam.version}</version>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 

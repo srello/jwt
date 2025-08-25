@@ -1,7 +1,6 @@
 package dev.srello.jwt.token.service;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.jwt.core.exception.RequestException;
 import dev.srello.jwt.token.dto.TokenODTO;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+import static com.nimbusds.jose.util.Base64.encode;
 import static dev.srello.jwt.core.messages.Messages.Error.TOKEN_INVALID;
 import static dev.srello.jwt.shared.dates.DateConverter.dateToLocalDateTime;
 import static dev.srello.jwt.shared.process.HashUtils.hashString;
@@ -44,7 +44,7 @@ public class TokenServiceImpl implements TokenService{
     public void createToken(OctetKeyPair jwk, UserODTO userODTO, TokenType tokenType, Date issuedAt, Date expiration, SignedJWT signedJWT) {
         Token token = Token.builder()
                 .jwtID(jwk.getKeyID())
-                .jwk(Base64.encode(jwk.toJSONString().getBytes()).toString())
+                .jwk(encode(jwk.toJSONString().getBytes()).toString())
                 .userId(userODTO.getId())
                 .issuedAt(dateToLocalDateTime(issuedAt))
                 .expiresAt(dateToLocalDateTime(expiration))

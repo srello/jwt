@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 
 import static dev.srello.jwt.core.request.RequestConstants.REFRESH_REQUEST_ATTRIBUTE;
+import static org.springframework.http.ResponseEntity.ok;
 
 
 @Controller
@@ -36,20 +37,20 @@ public class AuthController {
         UserODTO userODTO = authService.login(loginIDTO, response);
         UserRSRDTO userRSRDTO = userControllerTransformer.toRSRDTO(userODTO);
 
-        return ResponseEntity.ok().body(userRSRDTO);
+        return ok().body(userRSRDTO);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@CurrentUser UserODTO userODTO, HttpServletResponse response) {
         authService.logout(userODTO, response);
 
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 
     @GetMapping("/refresh")
     public ResponseEntity<Void> refresh(@CurrentUser UserODTO userODTO, HttpServletResponse response, @RequestAttribute(REFRESH_REQUEST_ATTRIBUTE)SignedJWT refreshToken) throws ParseException, JOSEException {
         authService.refresh(userODTO, response, refreshToken);
 
-        return ResponseEntity.ok().build();
+        return ok().build();
     }
 }

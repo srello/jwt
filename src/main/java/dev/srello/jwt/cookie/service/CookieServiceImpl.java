@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Stream.ofNullable;
@@ -36,6 +37,7 @@ public class CookieServiceImpl implements CookieService {
     public Map<String, String> getCookiesMap(Cookie[] cookies){
         return ofNullable(cookies)
                 .flatMap(Arrays::stream)
+                .filter(Objects::nonNull)
                 .collect(toMap(Cookie::getName, Cookie::getValue));
     }
 
