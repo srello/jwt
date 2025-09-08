@@ -35,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.nimbusds.jose.JWSAlgorithm.EdDSA;
 import static com.nimbusds.jose.jwk.Curve.Ed25519;
 import static com.nimbusds.jose.jwk.KeyUse.SIGNATURE;
+import static com.nimbusds.jwt.SignedJWT.parse;
 import static dev.srello.jwt.core.messages.Messages.Error.TOKEN_INVALID;
 import static dev.srello.jwt.core.messages.Messages.Error.TOKEN_NOT_PARSEABLE;
 import static dev.srello.jwt.jwt.enums.JwtValidity.*;
@@ -58,7 +59,6 @@ public class JwtServiceImpl implements JwtService {
     private int jwtExpiration;
     @Value("${app.auth.issuerUrl:srello.dev}")
     private String issuerUrl;
-
     @Value("${app.auth.audienceUrl:srello.dev}")
     private String audienceUrl;
 
@@ -95,8 +95,8 @@ public class JwtServiceImpl implements JwtService {
     public SignedJWT getDecodedJwt(String jwt) {
         try {
             if (jwt.matches("^Bearer .*"))
-                return SignedJWT.parse(jwt.split("Bearer ")[1]);
-            return SignedJWT.parse(jwt);
+                return parse(jwt.split("Bearer ")[1]);
+            return parse(jwt);
         } catch (ParseException ex) {
             throw new RequestException(BAD_REQUEST, TOKEN_NOT_PARSEABLE, jwt);
         }
@@ -173,7 +173,7 @@ public class JwtServiceImpl implements JwtService {
         JWSSigner signer = new Ed25519Signer(jwk);
         signedJWT.sign(signer);
         String s = signedJWT.serialize();
-        signedJWT = SignedJWT.parse(s);
+        signedJWT = parse(s);
 
         return signedJWT;
     }
@@ -201,7 +201,7 @@ public class JwtServiceImpl implements JwtService {
                 .generate();
     }
 
-    public Integer getUserIdFromJwtToken(SignedJWT signedJWT) {
+    private Integer getUserIdFromJwtToken(SignedJWT signedJWT) {
         try {
             return valueOf(signedJWT.getJWTClaimsSet().getSubject());
         } catch (ParseException ex) {

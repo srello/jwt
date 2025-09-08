@@ -18,6 +18,7 @@ public class UserODTO implements UserDetails {
     private String username;
     private String password;
     private Role role;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return of(new SimpleGrantedAuthority(role.name()));
