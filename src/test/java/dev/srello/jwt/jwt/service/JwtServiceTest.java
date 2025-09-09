@@ -1,14 +1,14 @@
-package dev.srello.jwt.jwt.service;
+package dev.srello.cocinillas.jwt.service;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import dev.srello.jwt.BaseTestClass;
-import dev.srello.jwt.core.exception.RequestException;
-import dev.srello.jwt.token.service.TokenService;
-import dev.srello.jwt.user.dto.UserODTO;
+import dev.srello.cocinillas.BaseTestClass;
+import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.token.service.TokenService;
+import dev.srello.cocinillas.user.dto.UserODTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
@@ -19,9 +19,9 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.Map;
 
-import static dev.srello.jwt.jwt.service.JwtServiceImpl.*;
-import static dev.srello.jwt.token.enums.TokenType.ANONYMOUS;
-import static dev.srello.jwt.token.enums.TokenType.AUTHORIZATION;
+import static dev.srello.cocinillas.jwt.service.JwtServiceImpl.*;
+import static dev.srello.cocinillas.token.enums.TokenType.ANONYMOUS;
+import static dev.srello.cocinillas.token.enums.TokenType.AUTHORIZATION;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

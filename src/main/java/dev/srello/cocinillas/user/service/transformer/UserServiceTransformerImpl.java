@@ -1,0 +1,17 @@
+package dev.srello.cocinillas.user.service.transformer;
+
+import dev.srello.cocinillas.user.dto.UserODTO;
+import dev.srello.cocinillas.user.model.User;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+
+@Component
+@RequiredArgsConstructor
+public class UserServiceTransformerImpl implements UserServiceTransformer {
+
+    private final UserServiceMapper userServiceMapper;
+    @Override
+    public UserODTO toODTO(User user) {
+        return userServiceMapper.toODTO(user);
+    }
+}

@@ -1,15 +1,15 @@
-package dev.srello.jwt.auth.controller;
+package dev.srello.cocinillas.auth.controller;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
-import dev.srello.jwt.BaseTestClass;
-import dev.srello.jwt.auth.controller.transformer.AuthControllerTransformer;
-import dev.srello.jwt.auth.dto.LoginIDTO;
-import dev.srello.jwt.auth.rdto.LoginRQRDTO;
-import dev.srello.jwt.auth.service.AuthService;
-import dev.srello.jwt.user.controller.transformer.UserControllerTransformer;
-import dev.srello.jwt.user.dto.UserODTO;
-import dev.srello.jwt.user.rdto.UserRSRDTO;
+import dev.srello.cocinillas.BaseTestClass;
+import dev.srello.cocinillas.auth.controller.transformer.AuthControllerTransformer;
+import dev.srello.cocinillas.auth.dto.LoginIDTO;
+import dev.srello.cocinillas.auth.rdto.LoginRQRDTO;
+import dev.srello.cocinillas.auth.service.AuthService;
+import dev.srello.cocinillas.user.controller.transformer.UserControllerTransformer;
+import dev.srello.cocinillas.user.dto.UserODTO;
+import dev.srello.cocinillas.user.rdto.UserRSRDTO;
 import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

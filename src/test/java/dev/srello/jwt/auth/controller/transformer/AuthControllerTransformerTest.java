@@ -1,8 +1,8 @@
-package dev.srello.jwt.auth.controller.transformer;
+package dev.srello.cocinillas.auth.controller.transformer;
 
-import dev.srello.jwt.BaseTestClass;
-import dev.srello.jwt.auth.dto.LoginIDTO;
-import dev.srello.jwt.auth.rdto.LoginRQRDTO;
+import dev.srello.cocinillas.BaseTestClass;
+import dev.srello.cocinillas.auth.dto.LoginIDTO;
+import dev.srello.cocinillas.auth.rdto.LoginRQRDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import org.mockito.InjectMocks;

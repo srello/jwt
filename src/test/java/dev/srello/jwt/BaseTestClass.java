@@ -1,4 +1,4 @@
-package dev.srello.jwt;
+package dev.srello.cocinillas;
 
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;

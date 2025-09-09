@@ -2,23 +2,23 @@ services:
 
   db:
     image: postgres:17
-    container_name: jwt-db
+    container_name: cocinillas-db
     restart: always
     environment:
       - POSTGRES_USER=myuser
       - POSTGRES_PASSWORD=mypassword
-      - POSTGRES_DB=jwt-db
+      - POSTGRES_DB=cocinillas-db
       - PGDATA=/var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
       - postgresql:/var/lib/postgresql/data
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U myuser -d jwt-db" ]
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d cocinillas-db" ]
       interval: 10s
       timeout: 3s
       retries: 3
 
 volumes:
   postgresql:
-    name: jwt_db_volume
+    name: cocinillas_db_volume

@@ -1,6 +1,6 @@
-package dev.srello.jwt.cookie.service;
+package dev.srello.cocinillas.cookie.service;
 
-import dev.srello.jwt.BaseTestClass;
+import dev.srello.cocinillas.BaseTestClass;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,7 +8,7 @@ import org.mockito.InjectMocks;
 
 import java.util.Map;
 
-import static dev.srello.jwt.cookie.service.CookieServiceImpl.SAME_SITE_COOKIE_ATTRIBUTE;
+import static dev.srello.cocinillas.cookie.service.CookieServiceImpl.SAME_SITE_COOKIE_ATTRIBUTE;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.util.ReflectionTestUtils.setField;
 
