@@ -31,7 +31,7 @@ public class RequestException extends RuntimeException {
         this.data = data;
     }
 
-    public RequestException(HttpStatus httpStatus, String message, Object data, String location){
+    public RequestException(HttpStatus httpStatus, String message, Object data, String location) {
         super(message);
         this.httpStatus = httpStatus;
         this.data = data;

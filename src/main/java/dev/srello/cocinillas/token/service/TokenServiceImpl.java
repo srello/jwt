@@ -22,13 +22,15 @@ import static org.springframework.http.HttpStatus.UNAUTHORIZED;
 
 @Service
 @RequiredArgsConstructor
-public class TokenServiceImpl implements TokenService{
+public class TokenServiceImpl implements TokenService {
     private final TokenRepository tokenRepository;
     private final TokenServiceTransformer tokenServiceTransformer;
+
     @Override
     public void deleteAllTokensFromUser(Integer userId) {
         tokenRepository.deleteAllTokensFromUser(userId);
     }
+
     @Override
     public void deleteAllTokensFromUserAndType(Integer userId, TokenType tokenType) {
         tokenRepository.deleteAllTokensFromUserAndType(userId, tokenType);

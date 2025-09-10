@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class TokenServiceTransformerImpl implements TokenServiceTransformer{
+public class TokenServiceTransformerImpl implements TokenServiceTransformer {
     private final TokenServiceMapper tokenServiceMapper;
+
     @Override
     public TokenODTO toODTO(Token token) {
         return tokenServiceMapper.toODTO(token);

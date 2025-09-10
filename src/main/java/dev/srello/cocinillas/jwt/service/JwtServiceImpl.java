@@ -36,8 +36,7 @@ import static com.nimbusds.jose.JWSAlgorithm.EdDSA;
 import static com.nimbusds.jose.jwk.Curve.Ed25519;
 import static com.nimbusds.jose.jwk.KeyUse.SIGNATURE;
 import static com.nimbusds.jwt.SignedJWT.parse;
-import static dev.srello.cocinillas.core.messages.Messages.Error.TOKEN_INVALID;
-import static dev.srello.cocinillas.core.messages.Messages.Error.TOKEN_NOT_PARSEABLE;
+import static dev.srello.cocinillas.core.messages.Messages.Error.*;
 import static dev.srello.cocinillas.jwt.enums.JwtValidity.*;
 import static dev.srello.cocinillas.shared.process.HashUtils.hashString;
 import static dev.srello.cocinillas.token.enums.TokenType.ANONYMOUS;
@@ -47,6 +46,7 @@ import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.Map.copyOf;
 import static java.util.UUID.randomUUID;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Service
 @RequiredArgsConstructor
@@ -55,6 +55,8 @@ public class JwtServiceImpl implements JwtService {
     public static final String USERNAME_CLAIM = "username";
     public static final String ROLE_CLAIM = "role";
     public static final String TOKEN_TYPE_CLAIM = "token-type";
+    private static final Clock clock = Clock.systemUTC();
+    private final TokenService tokenService;
     @Value("${app.auth.jwtExpiration:1800}")
     private int jwtExpiration;
     @Value("${app.auth.issuerUrl:srello.dev}")
@@ -62,11 +64,20 @@ public class JwtServiceImpl implements JwtService {
     @Value("${app.auth.audienceUrl:srello.dev}")
     private String audienceUrl;
 
-    private final TokenService tokenService;
-    private static final Clock clock = Clock.systemUTC();
+    private static OctetKeyPair generateOctetKeyPair() {
+        try {
+            return new OctetKeyPairGenerator(Ed25519)
+                    .keyUse(SIGNATURE)
+                    .keyID(randomUUID().toString())
+                    .algorithm(EdDSA)
+                    .generate();
+        } catch (JOSEException exception) {
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR);
+        }
+    }
 
     @Override
-    public SignedJWT generateToken(UserODTO userODTO, TokenType tokenType) throws JOSEException, ParseException {
+    public SignedJWT generateToken(UserODTO userODTO, TokenType tokenType) {
 
         OctetKeyPair jwk = generateOctetKeyPair();
         OctetKeyPair publicJWK = jwk.toPublicJWK();
@@ -80,14 +91,17 @@ public class JwtServiceImpl implements JwtService {
         }
 
         SignedJWT signedJWT = generateSignedJWT(userODTO, jwk, now, claims, expirationTime);
-        JWSVerifier verifier = new Ed25519Verifier(publicJWK);
+        try {
+            JWSVerifier verifier = new Ed25519Verifier(publicJWK);
 
-        tokenService.createToken(jwk, userODTO, tokenType, now, expirationTime, signedJWT);
+            tokenService.createToken(jwk, userODTO, tokenType, now, expirationTime, signedJWT);
 
-        checkArgument(signedJWT.verify(verifier));
-        checkArgument(new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));
-        checkArgument(signedJWT.getJWTClaimsSet().getIssuer().equals(issuerUrl));
-
+            checkArgument(signedJWT.verify(verifier));
+            checkArgument(new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));
+            checkArgument(signedJWT.getJWTClaimsSet().getIssuer().equals(issuerUrl));
+        } catch (JOSEException | ParseException exception) {
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+        }
         return signedJWT;
     }
 
@@ -136,18 +150,18 @@ public class JwtServiceImpl implements JwtService {
             OctetKeyPair publicJWK = OctetKeyPair.parse(jwk.toJSONString()).toPublicJWK();
             checkNotNull(publicJWK);
             JWSVerifier jwsVerifier = new Ed25519Verifier(publicJWK);
-            if(!signedJWT.verify(jwsVerifier))
+            if (!signedJWT.verify(jwsVerifier))
                 return INVALID;
 
             return claims.getExpirationTime().after(currentTime) && LocalDateTime.now().isBefore(token.getExpiresAt()) ? VALID : EXPIRED;
 
         } catch (ParseException | JOSEException ex) {
-            throw new RuntimeException(ex);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_VALIDATION_ERROR);
         }
     }
 
     @Override
-    public String getEmailFromJwtToken(SignedJWT signedJWT) {
+    public String getUsernameFromJwtToken(SignedJWT signedJWT) {
         try {
             return ((Map<?, ?>) signedJWT.getJWTClaimsSet().getClaim(USER_CLAIMS)).get(USERNAME_CLAIM).toString();
         } catch (ParseException ex) {
@@ -155,7 +169,7 @@ public class JwtServiceImpl implements JwtService {
         }
     }
 
-    private SignedJWT generateSignedJWT(UserODTO userODTO, OctetKeyPair jwk, Date now, Map<String, String> claims, Date expirationTime) throws JOSEException, ParseException {
+    private SignedJWT generateSignedJWT(UserODTO userODTO, OctetKeyPair jwk, Date now, Map<String, String> claims, Date expirationTime) {
         JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
                 .jwtID(jwk.getKeyID())
                 .issuer(issuerUrl)
@@ -170,10 +184,19 @@ public class JwtServiceImpl implements JwtService {
                 .build(),
                 claimsSet);
 
-        JWSSigner signer = new Ed25519Signer(jwk);
-        signedJWT.sign(signer);
+        try {
+            JWSSigner signer = new Ed25519Signer(jwk);
+            signedJWT.sign(signer);
+        } catch (JOSEException exception) {
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+        }
         String s = signedJWT.serialize();
-        signedJWT = parse(s);
+
+        try {
+            signedJWT = parse(s);
+        } catch (ParseException exception) {
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+        }
 
         return signedJWT;
     }
@@ -193,19 +216,11 @@ public class JwtServiceImpl implements JwtService {
         return userFilledClaims;
     }
 
-    private static OctetKeyPair generateOctetKeyPair() throws JOSEException {
-        return new OctetKeyPairGenerator(Ed25519)
-                .keyUse(SIGNATURE)
-                .keyID(randomUUID().toString())
-                .algorithm(EdDSA)
-                .generate();
-    }
-
     private Integer getUserIdFromJwtToken(SignedJWT signedJWT) {
         try {
             return valueOf(signedJWT.getJWTClaimsSet().getSubject());
-        } catch (ParseException ex) {
-            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, ex);
+        } catch (ParseException exception) {
+            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, exception);
         }
     }
 }

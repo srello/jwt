@@ -26,7 +26,7 @@ public class ArgonPassword {
 
     @Bean
     public Argon2PasswordEncoder passwordEncoder() {
-        if(of(argonSaltLength, argonHashLength, argonThreads, argonMemory, argonIterations).noneMatch(Objects::isNull))
+        if (of(argonSaltLength, argonHashLength, argonThreads, argonMemory, argonIterations).noneMatch(Objects::isNull))
             return defaultsForSpringSecurity_v5_8();
 
         return new Argon2PasswordEncoder(argonSaltLength, argonHashLength, argonThreads, argonMemory, argonIterations);

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface TokenRepository extends JpaRepository <Token, UUID> {
+public interface TokenRepository extends JpaRepository<Token, UUID> {
     @Modifying
     @Transactional
     @Query("DELETE from Token t WHERE t.userId = :userId")

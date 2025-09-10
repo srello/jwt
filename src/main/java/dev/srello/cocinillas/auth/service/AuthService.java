@@ -1,18 +1,22 @@
 package dev.srello.cocinillas.auth.service;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.auth.dto.LoginIDTO;
+import dev.srello.cocinillas.auth.dto.RegisterIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.text.ParseException;
-
 public interface AuthService {
 
-    UserODTO login(LoginIDTO loginIDTO, HttpServletResponse response) throws ParseException, JOSEException;
+    UserODTO login(LoginIDTO loginIDTO, HttpServletResponse response);
 
-    void refresh(UserODTO userODTO, HttpServletResponse response, SignedJWT refreshToken) throws ParseException, JOSEException;
+    void refresh(UserODTO userODTO, HttpServletResponse response, SignedJWT refreshToken);
 
     void logout(UserODTO userODTO, HttpServletResponse response);
+
+    void register(RegisterIDTO registerIDTO);
+
+    UserODTO confirm(String token, HttpServletResponse response);
+
+    void resendEmail(String email);
 }

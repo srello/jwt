@@ -36,6 +36,8 @@ server:
         secure: ${COOKIES_SECURE:true}
         sameSite: ${COOKIES_SAME_SITE:strict}
 
+security:
+  cors: ${CORS_ORIGIN:*}
 # ---- LOGGING ----
 #logging:
 #  level:
@@ -46,3 +48,23 @@ server:
 #    org.hibernate.SQL: ${LOGGING_HIBERNATE:ERROR}
 #    org.hibernate.type.descriptor.sql: ${LOGGING_HIBERNATE:ERROR}
 #    org.hibernate.orm.jdbc.bind: ${LOGGING_HIBERNATE:ERROR}
+
+#---- EMAIL ----
+email:
+  app-direction: "noreply@cocinillas.app"
+  host: ${EMAIL_HOST:smtp.gmail.com}
+  port: ${EMAIL_SMTP_PORT:587}
+  username: ${EMAIL_USER:noreply.cocinillas.app@gmail.com}
+  password: ${EMAIL_PASS}
+  properties:
+    smtp:
+      auth: true
+      connectiontimeout: 20000
+      starttls:
+        enable: ${EMAIL_TLS_ENABLED:false}
+        required: ${EMAIL_TLS_REQUIRED:false}
+      timeout: 5000
+      writetimeout: 5000
+
+front:
+  url: ${FRONT_URL:http://localhost:8081/api/v1}

@@ -49,6 +49,23 @@ class TokenServiceTest extends BaseTestClass {
     @Captor
     ArgumentCaptor<Token> tokenCaptor;
 
+    private static OctetKeyPair generateMockOctetKeyPair() throws JOSEException {
+        return new OctetKeyPairGenerator(Ed25519)
+                .keyUse(SIGNATURE)
+                .keyID(MOCK_KEY_ID)
+                .algorithm(EdDSA)
+                .generate();
+    }
+
+    private static SignedJWT generateMockSignedJWT(OctetKeyPair jwk) throws JOSEException {
+        SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(EdDSA)
+                .keyID(jwk.getKeyID())
+                .build(), new JWTClaimsSet.Builder().build());
+        JWSSigner signer = new Ed25519Signer(jwk);
+        signedJWT.sign(signer);
+        return signedJWT;
+    }
+
     @Test
     void shouldSucceed_deleteAllTokensFromUser() {
         doNothing().when(tokenRepository).deleteAllTokensFromUser(1);
@@ -123,22 +140,5 @@ class TokenServiceTest extends BaseTestClass {
         assertEquals(dateToLocalDateTime(expiration), result.getExpiresAt());
         assertEquals(AUTHORIZATION, result.getTokenType());
         assertEquals(signedJWTHash, result.getHash());
-    }
-
-    private static OctetKeyPair generateMockOctetKeyPair() throws JOSEException {
-        return new OctetKeyPairGenerator(Ed25519)
-                .keyUse(SIGNATURE)
-                .keyID(MOCK_KEY_ID)
-                .algorithm(EdDSA)
-                .generate();
-    }
-
-    private static SignedJWT generateMockSignedJWT(OctetKeyPair jwk) throws JOSEException {
-        SignedJWT signedJWT = new SignedJWT(new JWSHeader.Builder(EdDSA)
-                .keyID(jwk.getKeyID())
-                .build(), new JWTClaimsSet.Builder().build());
-        JWSSigner signer = new Ed25519Signer(jwk);
-        signedJWT.sign(signer);
-        return signedJWT;
     }
 }

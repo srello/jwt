@@ -22,6 +22,7 @@ public class CookieServiceImpl implements CookieService {
     private boolean securedCookies;
     @Value("${server.servlet.session.cookie.max-age:86400}")
     private Integer maxAgeCookies;
+
     @Override
     public Cookie createCookie(String key, String value) {
         var cookie = new Cookie(key, value);
@@ -34,7 +35,7 @@ public class CookieServiceImpl implements CookieService {
     }
 
     @Override
-    public Map<String, String> getCookiesMap(Cookie[] cookies){
+    public Map<String, String> getCookiesMap(Cookie[] cookies) {
         return ofNullable(cookies)
                 .flatMap(Arrays::stream)
                 .filter(Objects::nonNull)

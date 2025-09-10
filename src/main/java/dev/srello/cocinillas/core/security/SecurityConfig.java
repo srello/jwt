@@ -29,6 +29,7 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 import java.util.List;
 
+import static dev.srello.cocinillas.auth.controller.AuthController.*;
 import static java.util.List.of;
 
 @Slf4j
@@ -38,15 +39,15 @@ import static java.util.List.of;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] PERMITTED_ENDPOINTS = {"/auth/login"};
+    private static final String[] PERMITTED_ENDPOINTS = {AUTH_ROUTE + LOGIN_ENDPOINT, AUTH_ROUTE + REGISTER_ENDPOINT, AUTH_ROUTE + CONFIRM_ENDPOINT, AUTH_ROUTE + RESEND_ENDPOINT};
     public static final List<String> PERMITTED_ENDPOINTS_LIST = of(PERMITTED_ENDPOINTS);
-        private final AuthTokenFilter authTokenFilter;
+    private final AuthTokenFilter authTokenFilter;
     private final OriginFilter originFilter;
     private final PasswordEncoder passwordEncoder;
     private final AuthEntryPointJwt authEntryPointJwt;
 
 
-    @Value("${CORS_ORIGIN:*}")
+    @Value("${security.cors}")
     private String corsOrigins;
 
     @Bean
@@ -60,13 +61,13 @@ public class SecurityConfig {
                         .requestMatchers(PERMITTED_ENDPOINTS).permitAll()
                         .anyRequest().authenticated())
                 .securityMatcher("/**")
-            .addFilterBefore(originFilter, CorsFilter.class)
-            .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(originFilter, CorsFilter.class)
+                .addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .exceptionHandling(config ->
-                config.authenticationEntryPoint(authEntryPointJwt));
+                .exceptionHandling(config ->
+                        config.authenticationEntryPoint(authEntryPointJwt));
 
         return httpSecurity.build();
     }

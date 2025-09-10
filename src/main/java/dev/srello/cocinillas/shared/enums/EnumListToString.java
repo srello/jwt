@@ -16,8 +16,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @RequiredArgsConstructor
 public class EnumListToString<E extends Enum<E>> implements AttributeConverter<List<E>, String> {
 
-    private final Class<E> enumClass;
     private static final String DELIMITER = ",";
+    private final Class<E> enumClass;
 
     @Override
     public String convertToDatabaseColumn(List<E> eList) {
@@ -30,7 +30,7 @@ public class EnumListToString<E extends Enum<E>> implements AttributeConverter<L
 
     @Override
     public List<E> convertToEntityAttribute(String s) {
-        if(!StringUtils.hasLength(s))
+        if (!StringUtils.hasLength(s))
             return emptyList();
 
         return Arrays.stream(s.split(DELIMITER))

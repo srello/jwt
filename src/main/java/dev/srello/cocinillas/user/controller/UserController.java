@@ -18,7 +18,7 @@ public class UserController {
     private final UserControllerTransformer userControllerTransformer;
 
     @GetMapping("/me")
-    public ResponseEntity<UserRSRDTO> getMyUser(@CurrentUser UserODTO userODTO){
+    public ResponseEntity<UserRSRDTO> getMyUser(@CurrentUser UserODTO userODTO) {
         UserRSRDTO userRSRDTO = userControllerTransformer.toRSRDTO(userODTO);
 
         return ResponseEntity.ok().body(userRSRDTO);

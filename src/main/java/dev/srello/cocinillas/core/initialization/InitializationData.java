@@ -19,29 +19,35 @@ import static java.util.List.of;
 @RequiredArgsConstructor
 @Profile("!pro")
 public class InitializationData {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
     @Value("${LOAD_INITIAL_DATA:false}")
     private boolean loadInitialData;
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     @Bean
-    @Profile("dev")
-    public InitializingBean intialize(){
+    @Profile("DEV")
+    public InitializingBean intialize() {
         return this::createDbData;
     }
 
     private void createDbData() {
-        if(!loadInitialData) return;
+        if (!loadInitialData) return;
 
         User admin = User.builder()
                 .password(passwordEncoder.encode("1234Abc$"))
                 .role(ADMIN)
-                .username("admin@admin.com")
+                .email("admin@admin.com")
+                .username("admin")
+                .name("Aname")
+                .surname("Asurname")
                 .build();
         User user = User.builder()
                 .password(passwordEncoder.encode("1234Abc$"))
                 .role(USER)
-                .username("user@user.com")
+                .email("user@user.com")
+                .username("user")
+                .name("Uname")
+                .surname("Usurname")
                 .build();
 
         userRepository.saveAllAndFlush(of(admin, user));

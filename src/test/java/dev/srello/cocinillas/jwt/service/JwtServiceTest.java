@@ -1,6 +1,5 @@
 package dev.srello.cocinillas.jwt.service;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -45,7 +44,7 @@ class JwtServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_generateAuthToken() throws ParseException, JOSEException {
+    void shouldSucceed_generateAuthToken() throws ParseException {
         UserODTO userODTO = generateData(UserODTO.class);
 
         doNothing().when(tokenService).createToken(any(OctetKeyPair.class), eq(userODTO), eq(AUTHORIZATION), any(Date.class), any(Date.class), any(SignedJWT.class));
@@ -67,7 +66,7 @@ class JwtServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_generateAnonymousToken() throws ParseException, JOSEException {
+    void shouldSucceed_generateAnonymousToken() throws ParseException {
         UserODTO userODTO = generateData(UserODTO.class);
 
         doNothing().when(tokenService).createToken(any(OctetKeyPair.class), eq(userODTO), eq(ANONYMOUS), any(Date.class), any(Date.class), any(SignedJWT.class));
@@ -87,7 +86,7 @@ class JwtServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_getDecodedToken() throws ParseException, JOSEException {
+    void shouldSucceed_getDecodedToken() {
         UserODTO userODTO = generateData(UserODTO.class);
         doNothing().when(tokenService).createToken(any(OctetKeyPair.class), eq(userODTO), eq(AUTHORIZATION), any(Date.class), any(Date.class), any(SignedJWT.class));
         SignedJWT signedJWT = jwtService.generateToken(userODTO, AUTHORIZATION);
@@ -103,7 +102,7 @@ class JwtServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_getDecodedTokenBearer() throws ParseException, JOSEException {
+    void shouldSucceed_getDecodedTokenBearer() {
         UserODTO userODTO = generateData(UserODTO.class);
         doNothing().when(tokenService).createToken(any(OctetKeyPair.class), eq(userODTO), eq(AUTHORIZATION), any(Date.class), any(Date.class), any(SignedJWT.class));
         SignedJWT signedJWT = jwtService.generateToken(userODTO, AUTHORIZATION);
@@ -125,20 +124,20 @@ class JwtServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_getEmailFromToken() throws ParseException, JOSEException {
+    void shouldSucceed_getUsernameFromToken() {
         UserODTO userODTO = generateData(UserODTO.class);
         doNothing().when(tokenService).createToken(any(OctetKeyPair.class), eq(userODTO), eq(AUTHORIZATION), any(Date.class), any(Date.class), any(SignedJWT.class));
         SignedJWT signedJWT = jwtService.generateToken(userODTO, AUTHORIZATION);
 
-        String result = jwtService.getEmailFromJwtToken(signedJWT);
+        String result = jwtService.getUsernameFromJwtToken(signedJWT);
 
         assertEquals(userODTO.getUsername(), result);
     }
 
     @Test
-    void shouldFail_getEmailFromToken() {
+    void shouldFail_getUsernameFromToken() {
         SignedJWT signedJWT = generateData(SignedJWT.class);
-        Executable executable = () -> jwtService.getEmailFromJwtToken(signedJWT);
+        Executable executable = () -> jwtService.getUsernameFromJwtToken(signedJWT);
         assertThrows(RequestException.class, executable);
     }
 }

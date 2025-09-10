@@ -1,6 +1,5 @@
 package dev.srello.cocinillas.auth.controller;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.BaseTestClass;
 import dev.srello.cocinillas.auth.controller.transformer.AuthControllerTransformer;
@@ -16,12 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 
-import java.text.ParseException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpStatus.OK;
 
 class AuthControllerTest extends BaseTestClass {
@@ -37,26 +32,26 @@ class AuthControllerTest extends BaseTestClass {
     HttpServletResponse response;
 
     @Test
-    void shouldSucceed_login() throws ParseException, JOSEException {
+    void shouldSucceed_login() {
         LoginRQRDTO loginRQRDTO = generateData(LoginRQRDTO.class);
         LoginIDTO loginIDTO = generateData(LoginIDTO.class);
         UserODTO userODTO = generateData(UserODTO.class);
         UserRSRDTO userRSRDTO = generateData(UserRSRDTO.class);
 
-        doReturn(loginIDTO).when(authControllerTransformer).toIDTO(loginRQRDTO);
+        doReturn(loginIDTO).when(authControllerTransformer).toLoginIDTO(loginRQRDTO);
         doReturn(userODTO).when(authService).login(loginIDTO, response);
         doReturn(userRSRDTO).when(userControllerTransformer).toRSRDTO(userODTO);
 
         ResponseEntity<UserRSRDTO> result = authController.login(loginRQRDTO, response);
 
         assertEquals(userRSRDTO, result.getBody());
-        verify(authControllerTransformer).toIDTO(loginRQRDTO);
+        verify(authControllerTransformer).toLoginIDTO(loginRQRDTO);
         verify(authService).login(loginIDTO, response);
         verify(userControllerTransformer).toRSRDTO(userODTO);
     }
 
     @Test
-    void shouldSucceed_logout(){
+    void shouldSucceed_logout() {
         UserODTO userODTO = generateData(UserODTO.class);
         doNothing().when(authService).logout(userODTO, response);
 
@@ -68,7 +63,7 @@ class AuthControllerTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_refresh() throws ParseException, JOSEException {
+    void shouldSucceed_refresh() {
         UserODTO userODTO = generateData(UserODTO.class);
         SignedJWT signedJWT = generateData(SignedJWT.class);
 

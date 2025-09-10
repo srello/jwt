@@ -1,6 +1,5 @@
 package dev.srello.cocinillas.auth.service;
 
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.BaseTestClass;
@@ -19,11 +18,11 @@ import org.mockito.Mock;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.text.ParseException;
-
 import static dev.srello.cocinillas.jwt.enums.JwtValidity.INVALID;
 import static dev.srello.cocinillas.jwt.enums.JwtValidity.VALID;
 import static dev.srello.cocinillas.token.enums.TokenType.*;
+import static dev.srello.cocinillas.user.enums.Role.NULL;
+import static dev.srello.cocinillas.user.enums.Role.USER;
 import static java.lang.String.format;
 import static java.util.Arrays.stream;
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,10 +44,11 @@ class AuthServiceTest extends BaseTestClass {
     TokenService tokenService;
 
     @Test
-    void shouldSucceed_login() throws ParseException, JOSEException {
+    void shouldSucceed_login() {
         LoginIDTO loginIDTO = generateData(LoginIDTO.class);
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         UserODTO userODTO = generateData(UserODTO.class);
+        userODTO.setRole(USER);
         SignedJWT authJWT = generateData(SignedJWT.class);
         Base64URL[] jwtParts = authJWT.getParsedParts();
         String authJWTStr = format("%s.%s", jwtParts[0], jwtParts[1]);
@@ -84,10 +84,33 @@ class AuthServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldFail_loginPasswordsDoNotMatch() throws ParseException, JOSEException {
+    void shouldFail_loginUserNotEnabled() {
         LoginIDTO loginIDTO = generateData(LoginIDTO.class);
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         UserODTO userODTO = generateData(UserODTO.class);
+        userODTO.setRole(NULL);
+        Executable executable = () -> authService.login(loginIDTO, response);
+
+        doReturn(userODTO).when(userService).getByUsername(loginIDTO.getUsername());
+
+        assertThrows(RequestException.class, executable);
+
+        verify(userService).getByUsername(loginIDTO.getUsername());
+        verify(passwordEncoder, never()).matches(loginIDTO.getPassword(), userODTO.getPassword());
+        verify(tokenService, never()).deleteAllTokensFromUser(userODTO.getId());
+        verify(jwtService, never()).generateToken(userODTO, AUTHORIZATION);
+        verify(jwtService, never()).generateToken(userODTO, REFRESH);
+        verify(cookieService, never()).createCookie(any(), any());
+        verify(cookieService, never()).createCookie(any(), any());
+        verify(cookieService, never()).createCookie(any(), any());
+    }
+
+    @Test
+    void shouldFail_loginPasswordsDoNotMatch() {
+        LoginIDTO loginIDTO = generateData(LoginIDTO.class);
+        MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
+        UserODTO userODTO = generateData(UserODTO.class);
+        userODTO.setRole(USER);
         Executable executable = () -> authService.login(loginIDTO, response);
 
         doReturn(userODTO).when(userService).getByUsername(loginIDTO.getUsername());
@@ -106,7 +129,7 @@ class AuthServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_refresh() throws ParseException, JOSEException {
+    void shouldSucceed_refresh() {
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         SignedJWT refreshToken = generateData(SignedJWT.class);
         SignedJWT authToken = generateData(SignedJWT.class);
@@ -123,7 +146,7 @@ class AuthServiceTest extends BaseTestClass {
         doReturn(authCookie).when(cookieService).createCookie(AUTHORIZATION.name(), authJWTStr);
         doReturn(signatureCookie).when(cookieService).createCookie(SIGNATURE.name(), signatureJWTStr);
 
-        authService.refresh(userODTO, response,refreshToken);
+        authService.refresh(userODTO, response, refreshToken);
 
         verify(jwtService).verifyJwt(refreshToken);
         verify(jwtService).generateToken(userODTO, AUTHORIZATION);
@@ -133,7 +156,7 @@ class AuthServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldFail_refreshInvalidToken() throws ParseException, JOSEException {
+    void shouldFail_refreshInvalidToken() {
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         SignedJWT refreshToken = generateData(SignedJWT.class);
         UserODTO userODTO = generateData(UserODTO.class);
@@ -151,7 +174,7 @@ class AuthServiceTest extends BaseTestClass {
     }
 
     @Test
-    void shouldSucceed_logout(){
+    void shouldSucceed_logout() {
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         UserODTO userODTO = generateData(UserODTO.class);
         Cookie deletedAuthCookie = new Cookie(AUTHORIZATION.name(), null);

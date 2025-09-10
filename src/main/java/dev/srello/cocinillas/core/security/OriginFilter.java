@@ -29,7 +29,7 @@ public class OriginFilter implements Filter {
         var httpRequest = (HttpServletRequest) request;
         String endpoint = httpRequest.getRequestURI().substring(7);
 
-        if(ALIVE_ENDPOINT.equals(endpoint)) {
+        if (ALIVE_ENDPOINT.equals(endpoint)) {
             chain.doFilter(request, response);
             return;
         }

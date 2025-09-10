@@ -12,10 +12,12 @@ public class Messages {
         public static final String USER_PARAMETERS_ERROR = "Error in user parameters";
         public static final String USER_PASSWORD_DONT_MATCH = "User+password doesn't match";
         public static final String USER_NOT_ENABLED = "User not enabled";
+        public static final String USER_ALREADY_ENABLED = "User already enabled";
         public static final String USER_ADMIN_CANNOT_DELETE_OWN_ACCOUNT = "Admin cannot delete their own account";
-        public static final String USER_WITH_THIS_EMAIL_OR_PHONE_EXISTS = "User with this email or phone already exists";
-        public static final String USER_WITH_THIS_EMAIL_TAKEN = "This email is already taken";
+        public static final String USER_WITH_THIS_EMAIL_EXISTS = "User with this email already exists";
         public static final String USER_NOT_AUTHENTICATED = "User not authenticated";
+        public static final String TOKEN_GENERATION_ERROR = "Error generating token. Try again later.";
+        public static final String TOKEN_VALIDATION_ERROR = "Error generating token. Try again later.";
         public static final String TOKEN_INVALID = "Token invalid";
         public static final String TOKEN_NOT_FOUND = "Token not found";
         public static final String TOKEN_NOT_PARSEABLE = "Token not parseable";
@@ -29,5 +31,6 @@ public class Messages {
         public static final String SHIFT_LIST_NULL_OR_EMPTY = "Shift list is null or empty";
         public static final String GENERIC_ERROR = "Something went wrong. Please try again later, or contact support.";
         public static final String ORIGIN_OR_REFERER_HEADER_MISSING = "Requests without Origin or Referer are not allowed";
+        public static final String EMAIL_SEND_ERROR = "There was an error while trying to send the email. Try again later.";
     }
 }

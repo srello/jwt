@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UserControllerTransformerImpl implements UserControllerTransformer {
     private final UserControllerMapper userControllerMapper;
+
     @Override
     public UserRSRDTO toRSRDTO(UserODTO userODTO) {
         return userControllerMapper.toRSRDTO(userODTO);
