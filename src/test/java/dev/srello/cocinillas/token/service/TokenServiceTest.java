@@ -70,18 +70,18 @@ class TokenServiceTest extends BaseTestClass {
     void shouldSucceed_deleteAllTokensFromUser() {
         doNothing().when(tokenRepository).deleteAllTokensFromUser(1);
 
-        tokenService.deleteAllTokensFromUser(1);
+        tokenService.deleteAllTokensFromUser(1L);
 
         verify(tokenRepository).deleteAllTokensFromUser(1);
     }
 
     @Test
     void shouldSucceed_deleteAllTokensFromUserAndType() {
-        doNothing().when(tokenRepository).deleteAllTokensFromUserAndType(1, AUTHORIZATION);
+        doNothing().when(tokenRepository).deleteAllTokensFromUserAndType(1L, AUTHORIZATION);
 
-        tokenService.deleteAllTokensFromUserAndType(1, AUTHORIZATION);
+        tokenService.deleteAllTokensFromUserAndType(1L, AUTHORIZATION);
 
-        verify(tokenRepository).deleteAllTokensFromUserAndType(1, AUTHORIZATION);
+        verify(tokenRepository).deleteAllTokensFromUserAndType(1L, AUTHORIZATION);
     }
 
     @Test

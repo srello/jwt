@@ -9,9 +9,9 @@ import dev.srello.cocinillas.user.dto.UserODTO;
 import java.util.Date;
 
 public interface TokenService {
-    void deleteAllTokensFromUser(Integer userId);
+    void deleteAllTokensFromUser(Long userId);
 
-    void deleteAllTokensFromUserAndType(Integer userId, TokenType tokenType);
+    void deleteAllTokensFromUserAndType(Long userId, TokenType tokenType);
 
     TokenODTO getTokenByHash(String hash);
 

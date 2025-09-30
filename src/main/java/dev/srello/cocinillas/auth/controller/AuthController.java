@@ -27,12 +27,12 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequiredArgsConstructor
 @RequestMapping(AUTH_ROUTE)
 public class AuthController {
-
     public static final String CONFIRM_ENDPOINT = "/confirm";
     public static final String LOGIN_ENDPOINT = "/login";
     public static final String REGISTER_ENDPOINT = "/register";
     public static final String AUTH_ROUTE = "/auth";
     public static final String RESEND_ENDPOINT = "/resend";
+
     private final AuthService authService;
     private final AuthControllerTransformer authControllerTransformer;
     private final UserControllerTransformer userControllerTransformer;

@@ -48,7 +48,7 @@ public class Token {
 
     @NotNull
     @Column(updatable = false, nullable = false)
-    private Integer userId;
+    private Long userId;
 
     private String hash;
 

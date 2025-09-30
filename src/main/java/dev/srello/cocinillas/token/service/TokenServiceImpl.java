@@ -27,12 +27,12 @@ public class TokenServiceImpl implements TokenService {
     private final TokenServiceTransformer tokenServiceTransformer;
 
     @Override
-    public void deleteAllTokensFromUser(Integer userId) {
+    public void deleteAllTokensFromUser(Long userId) {
         tokenRepository.deleteAllTokensFromUser(userId);
     }
 
     @Override
-    public void deleteAllTokensFromUserAndType(Integer userId, TokenType tokenType) {
+    public void deleteAllTokensFromUserAndType(Long userId, TokenType tokenType) {
         tokenRepository.deleteAllTokensFromUserAndType(userId, tokenType);
     }
 

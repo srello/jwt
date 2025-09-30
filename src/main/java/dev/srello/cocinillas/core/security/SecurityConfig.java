@@ -30,6 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static dev.srello.cocinillas.auth.controller.AuthController.*;
+import static dev.srello.cocinillas.recipe.controller.RecipeController.RECIPE_ROUTE;
 import static java.util.List.of;
 
 @Slf4j
@@ -39,7 +40,7 @@ import static java.util.List.of;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] PERMITTED_ENDPOINTS = {AUTH_ROUTE + LOGIN_ENDPOINT, AUTH_ROUTE + REGISTER_ENDPOINT, AUTH_ROUTE + CONFIRM_ENDPOINT, AUTH_ROUTE + RESEND_ENDPOINT};
+    private static final String[] PERMITTED_ENDPOINTS = {AUTH_ROUTE + LOGIN_ENDPOINT, AUTH_ROUTE + REGISTER_ENDPOINT, AUTH_ROUTE + CONFIRM_ENDPOINT, AUTH_ROUTE + RESEND_ENDPOINT, RECIPE_ROUTE};
     public static final List<String> PERMITTED_ENDPOINTS_LIST = of(PERMITTED_ENDPOINTS);
     private final AuthTokenFilter authTokenFilter;
     private final OriginFilter originFilter;

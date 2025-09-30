@@ -14,12 +14,12 @@ public interface TokenRepository extends JpaRepository<Token, UUID> {
     @Modifying
     @Transactional
     @Query("DELETE from Token t WHERE t.userId = :userId")
-    void deleteAllTokensFromUser(Integer userId);
+    void deleteAllTokensFromUser(Long userId);
 
     @Modifying
     @Transactional
     @Query("DELETE from Token t WHERE t.userId = :userId AND t.tokenType = :type")
-    void deleteAllTokensFromUserAndType(Integer userId, TokenType type);
+    void deleteAllTokensFromUserAndType(Long userId, TokenType type);
 
     Optional<Token> findByHash(String hash);
 }
