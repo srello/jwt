@@ -11,7 +11,9 @@ import org.springframework.data.domain.Page;
 public interface RecipeControllerTransformer {
     RecipeIDTO toRecipeIDTO(@NonNull RecipeRQRDTO recipeRQRDTO);
 
-    Page<RecipeRSRDTO> toRecipeRSRDTO(@NonNull Page<RecipeODTO> recipesODTO);
+    Page<RecipeRSRDTO> toRecipesRSRDTO(@NonNull Page<RecipeODTO> recipesODTO);
+
+    RecipeRSRDTO toRecipeRSRDTO(@NonNull RecipeODTO recipeODTO);
 
     Page<RecipeSummaryRSRDTO> toRecipeSummaryRSRDTO(@NonNull Page<RecipeODTO> recipesODTO);
 }

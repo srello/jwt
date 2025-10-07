@@ -1,6 +1,5 @@
 package dev.srello.cocinillas.recipe.model;
 
-import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import jakarta.persistence.*;
@@ -9,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,11 +31,20 @@ public class Recipe {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany(fetch = EAGER)
-    private List<Product> ingredients;
+    @Column(nullable = false, length = 3000)
+    private String description;
+
+    @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
+    private List<Instruction> instructions;
+
+    @ManyToMany(fetch = EAGER, cascade = ALL)
+    private List<Ingredient> ingredients;
 
     @Column
     private RecipeVisibility visibility;
+
+    @Column(nullable = false)
+    private Integer totalDuration;
 
     @ManyToMany(cascade = {ALL}, fetch = EAGER)
     private List<Tag> tags;
@@ -45,7 +54,10 @@ public class Recipe {
             name = "recipe_images",
             joinColumns = @JoinColumn(name = "recipe_id")
     )
-    @Column(name = "url")
-    private List<String> imageUrls = new ArrayList<>();
+    @Column(name = "key")
+    private List<String> imageKeys = new ArrayList<>();
+
+    @Column(nullable = false)
+    private LocalDateTime creationDate;
 
 }

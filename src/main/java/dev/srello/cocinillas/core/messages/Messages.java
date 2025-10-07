@@ -32,5 +32,9 @@ public class Messages {
         public static final String GENERIC_ERROR = "Something went wrong. Please try again later, or contact support.";
         public static final String ORIGIN_OR_REFERER_HEADER_MISSING = "Requests without Origin or Referer are not allowed";
         public static final String EMAIL_SEND_ERROR = "There was an error while trying to send the email. Try again later.";
+
+        //RECIPES
+        public static final String RECIPE_NOT_FOUND = "Recipe with id %s not found.";
+
     }
 }

@@ -9,6 +9,7 @@ import dev.srello.cocinillas.recipe.rdto.RecipeSummaryRSRDTO;
 import dev.srello.cocinillas.shared.pagination.transformer.PaginationMapper;
 import dev.srello.cocinillas.tags.controller.transformer.TagControllerMapper;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 
 @Mapper(uses = {PaginationMapper.class, TagControllerMapper.class, ProductControllerMapper.class})
@@ -17,6 +18,7 @@ public interface RecipeControllerMapper {
 
     RecipeRSRDTO toRecipeRSRDTO(RecipeODTO recipeODTO);
 
+    @Mapping(target = "calories", source = "recipeODTO.macros.calories")
     RecipeSummaryRSRDTO toRecipeSummaryRSRDTO(RecipeODTO recipeODTO);
 
     default Page<RecipeSummaryRSRDTO> toRecipeSummaryRSRDTO(Page<RecipeODTO> recipesODTO) {

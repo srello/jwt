@@ -5,6 +5,8 @@ import java.util.List;
 public record RecipeSummaryRSRDTO(
         Long id,
         String name,
-        List<String> imageUrls
+        List<String> imageUrls,
+        Integer totalDuration,
+        Double calories
 ) {
 }

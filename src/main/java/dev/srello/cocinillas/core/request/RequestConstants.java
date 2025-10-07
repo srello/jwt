@@ -9,4 +9,5 @@ public class RequestConstants {
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE = "Authorization";
     public static final String REFRESH_REQUEST_ATTRIBUTE = "Refresh";
     public static final String ENDPOINT_ATTRIBUTE = "endpoint";
+    public static final String ID_PATH_VARIABLE = "/{id}";
 }

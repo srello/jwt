@@ -22,8 +22,13 @@ public class RecipeControllerTransformerImpl implements RecipeControllerTransfor
     }
 
     @Override
-    public Page<RecipeRSRDTO> toRecipeRSRDTO(@NonNull Page<RecipeODTO> recipesODTO) {
+    public Page<RecipeRSRDTO> toRecipesRSRDTO(@NonNull Page<RecipeODTO> recipesODTO) {
         return mapper.toRecipesRSRDTO(recipesODTO);
+    }
+
+    @Override
+    public RecipeRSRDTO toRecipeRSRDTO(@NonNull RecipeODTO recipeODTO) {
+        return mapper.toRecipeRSRDTO(recipeODTO);
     }
 
     @Override

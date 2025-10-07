@@ -7,4 +7,6 @@ import org.springframework.data.domain.Page;
 
 public interface RecipeServiceTransformer {
     Page<RecipeODTO> toRecipesODTO(@NonNull Page<Recipe> recipes);
+
+    RecipeODTO toRecipeODTO(@NonNull Recipe recipes);
 }

@@ -6,6 +6,8 @@ import dev.srello.cocinillas.product.enums.ProductCategory;
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.reposiroty.ProductRepository;
 import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.recipe.model.Ingredient;
+import dev.srello.cocinillas.recipe.model.Instruction;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
 import dev.srello.cocinillas.tags.model.Tag;
@@ -24,11 +26,13 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import static dev.srello.cocinillas.user.enums.Role.ADMIN;
 import static dev.srello.cocinillas.user.enums.Role.USER;
+import static java.time.LocalDateTime.now;
 import static java.util.Collections.shuffle;
 import static java.util.List.of;
 import static java.util.concurrent.ThreadLocalRandom.current;
@@ -43,12 +47,13 @@ public class InitializationData {
     private final TagRepository tagRepository;
     private final TagTypeRepository tagTypeRepository;
     private final PasswordEncoder passwordEncoder;
+    private final String[] devImageKeys = {"carbonara.png", "ensalada cesar.png", "paella.png", "reina pepiada.png", "verduras thai.jpg"};
     @Value("${LOAD_INITIAL_DATA:false}")
     private boolean loadInitialData;
 
     @Bean
     @Profile("DEV")
-    public InitializingBean intialize() {
+    public InitializingBean initialize() {
         return this::createDbData;
     }
 
@@ -130,29 +135,52 @@ public class InitializationData {
                     .name(faker.food().ingredient())
                     .productCategory(productCategories[current().nextInt(productCategories.length)])
                     .baseUnit(units[current().nextInt(units.length)])
-                    .fat(current().nextDouble(1, 500))
-                    .calories(current().nextDouble(1, 500))
-                    .carbohydrates(current().nextDouble(1, 500))
-                    .protein(current().nextDouble(1, 500))
+                    .fat(current().nextDouble(1, 100))
+                    .calories(current().nextDouble(1, 150))
+                    .carbohydrates(current().nextDouble(1, 100))
+                    .protein(current().nextDouble(1, 100))
                     .unitConversions(of(unitConversion))
                     .build());
         }
         return ingredients;
     }
 
-    private List<Recipe> generateRandomRecipes(Faker faker, List<Product> ingredients) {
+    private List<Recipe> generateRandomRecipes(Faker faker, List<Product> products) {
         List<Recipe> recipes = new ArrayList<>();
         RecipeVisibility[] recipeVisibilities = RecipeVisibility.values();
         for (int i = 0; i < 50; i++) {
-            shuffle(ingredients);
+            shuffle(products);
             String name = faker.food().dish();
+            List<Ingredient> ingredients = products.subList(0, current().nextInt(5, 10))
+                    .stream().map(product -> Ingredient.builder()
+                            .product(product)
+                            .quantity(current().nextDouble(10, 100))
+                            .build())
+                    .toList();
+            LocalDateTime now = now();
             recipes.add(Recipe.builder()
                     .name(name)
+                    .description(faker.backToTheFuture().quote())
                     .visibility(recipeVisibilities[current().nextInt(recipeVisibilities.length)])
-                    .ingredients(ingredients.subList(0, current().nextInt(5, 10)))
-                    .imageUrls(of("recipes/" + name))
+                    .ingredients(ingredients)
+                    .instructions(generateRandomInstructions(faker))
+                    .imageKeys(of(devImageKeys[current().nextInt(devImageKeys.length)]))
+                    .totalDuration(current().nextInt(5, 240))
+                    .creationDate(now.minusDays(current().nextLong(60)))
                     .build());
         }
         return recipes;
+    }
+
+    private List<Instruction> generateRandomInstructions(Faker faker) {
+        List<Instruction> instructions = new ArrayList<>();
+        int totalInstructions = current().nextInt(5, 10);
+        for (int i = 0; i < totalInstructions; i++) {
+            instructions.add(Instruction.builder()
+                    .description(faker.chuckNorris().fact())
+                    .timer(current().nextBoolean() ? null : current().nextDouble(2, 60))
+                    .build());
+        }
+        return instructions;
     }
 }

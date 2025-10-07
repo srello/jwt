@@ -7,4 +7,6 @@ import org.springframework.data.domain.Page;
 
 public interface RecipeService {
     Page<RecipeODTO> getRecipesPaginated(RecipeIDTO recipeIDTO, PaginationIDTO pagination);
+
+    RecipeODTO getRecipeById(Long id);
 }
