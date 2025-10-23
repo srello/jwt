@@ -9,6 +9,7 @@ import java.util.List;
 public record RecipeRSRDTO(
         Long id,
         String name,
+        String description,
         List<IngredientRSRDTO> ingredients,
         List<InstructionRSRDTO> instructions,
         RecipeVisibility visibility,

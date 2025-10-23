@@ -5,7 +5,7 @@ import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.BaseTestClass;
 import dev.srello.cocinillas.auth.dto.LoginIDTO;
 import dev.srello.cocinillas.cookie.service.CookieService;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.jwt.service.JwtService;
 import dev.srello.cocinillas.token.service.TokenService;
 import dev.srello.cocinillas.user.dto.UserODTO;
@@ -58,7 +58,7 @@ class AuthServiceTest extends BaseTestClass {
         Cookie signatureCookie = generateData(Cookie.class);
         Cookie refreshCookie = generateData(Cookie.class);
 
-        doReturn(userODTO).when(userService).getByUsername(loginIDTO.getUsername());
+        doReturn(userODTO).when(userService).getByEmail(loginIDTO.getEmail());
         doReturn(true).when(passwordEncoder).matches(loginIDTO.getPassword(), userODTO.getPassword());
         doNothing().when(tokenService).deleteAllTokensFromUser(userODTO.getId());
         doReturn(authJWT).when(jwtService).generateToken(userODTO, AUTHORIZATION);
@@ -73,7 +73,7 @@ class AuthServiceTest extends BaseTestClass {
         assertEquals(authCookie.getValue(), response.getCookie(authCookie.getName()).getValue());
         assertEquals(signatureCookie.getValue(), response.getCookie(signatureCookie.getName()).getValue());
         assertEquals(refreshCookie.getValue(), response.getCookie(refreshCookie.getName()).getValue());
-        verify(userService).getByUsername(loginIDTO.getUsername());
+        verify(userService).getByEmail(loginIDTO.getEmail());
         verify(passwordEncoder).matches(loginIDTO.getPassword(), userODTO.getPassword());
         verify(tokenService).deleteAllTokensFromUser(userODTO.getId());
         verify(jwtService).generateToken(userODTO, AUTHORIZATION);
@@ -89,13 +89,13 @@ class AuthServiceTest extends BaseTestClass {
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         UserODTO userODTO = generateData(UserODTO.class);
         userODTO.setRole(NULL);
+
+        doReturn(userODTO).when(userService).getByEmail(loginIDTO.getEmail());
+
         Executable executable = () -> authService.login(loginIDTO, response);
-
-        doReturn(userODTO).when(userService).getByUsername(loginIDTO.getUsername());
-
         assertThrows(RequestException.class, executable);
 
-        verify(userService).getByUsername(loginIDTO.getUsername());
+        verify(userService).getByEmail(loginIDTO.getEmail());
         verify(passwordEncoder, never()).matches(loginIDTO.getPassword(), userODTO.getPassword());
         verify(tokenService, never()).deleteAllTokensFromUser(userODTO.getId());
         verify(jwtService, never()).generateToken(userODTO, AUTHORIZATION);
@@ -111,14 +111,14 @@ class AuthServiceTest extends BaseTestClass {
         MockHttpServletResponse response = generateData(MockHttpServletResponse.class);
         UserODTO userODTO = generateData(UserODTO.class);
         userODTO.setRole(USER);
-        Executable executable = () -> authService.login(loginIDTO, response);
 
-        doReturn(userODTO).when(userService).getByUsername(loginIDTO.getUsername());
+        doReturn(userODTO).when(userService).getByEmail(loginIDTO.getEmail());
         doReturn(false).when(passwordEncoder).matches(loginIDTO.getPassword(), userODTO.getPassword());
 
+        Executable executable = () -> authService.login(loginIDTO, response);
         assertThrows(RequestException.class, executable);
 
-        verify(userService).getByUsername(loginIDTO.getUsername());
+        verify(userService).getByEmail(loginIDTO.getEmail());
         verify(passwordEncoder).matches(loginIDTO.getPassword(), userODTO.getPassword());
         verify(tokenService, never()).deleteAllTokensFromUser(userODTO.getId());
         verify(jwtService, never()).generateToken(userODTO, AUTHORIZATION);

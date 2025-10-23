@@ -2,7 +2,7 @@ package dev.srello.cocinillas.token.service;
 
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jwt.SignedJWT;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.token.dto.TokenODTO;
 import dev.srello.cocinillas.token.enums.TokenType;
 import dev.srello.cocinillas.token.model.Token;
@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 
 import static com.nimbusds.jose.util.Base64.encode;
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.TOKEN_INVALID_CODE;
 import static dev.srello.cocinillas.core.messages.Messages.Error.TOKEN_INVALID;
 import static dev.srello.cocinillas.shared.dates.DateConverter.dateToLocalDateTime;
 import static dev.srello.cocinillas.shared.process.HashUtils.hashString;
@@ -38,7 +39,7 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public TokenODTO getTokenByHash(String hash) {
-        Token token = tokenRepository.findByHash(hash).orElseThrow(() -> new RequestException(UNAUTHORIZED, TOKEN_INVALID));
+        Token token = tokenRepository.findByHash(hash).orElseThrow(() -> new RequestException(UNAUTHORIZED, TOKEN_INVALID, TOKEN_INVALID_CODE));
         return tokenServiceTransformer.toODTO(token);
     }
 

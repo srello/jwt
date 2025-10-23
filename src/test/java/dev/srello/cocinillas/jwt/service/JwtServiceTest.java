@@ -5,7 +5,7 @@ import com.nimbusds.jose.util.Base64URL;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.BaseTestClass;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.token.service.TokenService;
 import dev.srello.cocinillas.user.dto.UserODTO;
 import org.junit.jupiter.api.BeforeEach;

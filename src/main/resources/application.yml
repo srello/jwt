@@ -67,4 +67,12 @@ email:
       writetimeout: 5000
 
 front:
-  url: ${FRONT_URL:http://localhost:8081/api/v1}
+  url: ${FRONT_URL:http://localhost:5173}
+
+r2:
+  accountId: ${R2_ACCOUNT}
+  accessKey: ${R2_ACCESS_KEY}
+  secretKey: ${R2_SECRET_KEY}
+  bucket: ${R2_BUCKET:cocinillas-app}
+  presigned-url-duration: ${R2_DURATION:5}
+  region: ${R2_REGION:weur}

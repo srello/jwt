@@ -32,7 +32,7 @@ class AuthControllerTransformerTest extends BaseTestClass {
         LoginIDTO result = authControllerTransformer.toLoginIDTO(loginRQRDTO);
 
         assertEquals(loginRQRDTO.password(), result.getPassword());
-        assertEquals(loginRQRDTO.username(), result.getUsername());
+        assertEquals(loginRQRDTO.email(), result.getEmail());
         verify(authControllerTransformerMapper).toLoginIDTO(loginRQRDTO);
     }
 

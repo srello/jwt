@@ -15,7 +15,6 @@ public class AuthServiceTransformerImpl implements AuthServiceTransformer {
 
     @Override
     public UserIDTO toUserIDTO(@NonNull RegisterIDTO registerIDTO) {
-
         return authServiceMapper.toUserIDTO(registerIDTO);
     }
 

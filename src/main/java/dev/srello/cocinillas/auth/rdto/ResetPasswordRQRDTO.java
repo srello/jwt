@@ -3,9 +3,9 @@ package dev.srello.cocinillas.auth.rdto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 
-public record LoginRQRDTO(
+public record ResetPasswordRQRDTO(
         @NotEmpty(message = "Email is required")
-        String email,
+        String token,
 
         @NotEmpty(message = "Password is required")
         @Pattern(

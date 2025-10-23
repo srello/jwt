@@ -14,6 +14,7 @@ public class RecipeODTO {
 
     private Long id;
     private String name;
+    private String description;
     private List<IngredientODTO> ingredients;
     private List<InstructionODTO> instructions;
     private RecipeVisibility visibility;

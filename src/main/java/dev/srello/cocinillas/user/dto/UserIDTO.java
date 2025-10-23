@@ -3,8 +3,10 @@ package dev.srello.cocinillas.user.dto;
 import dev.srello.cocinillas.user.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @AllArgsConstructor
 public class UserIDTO {
     private String username;

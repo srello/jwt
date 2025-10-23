@@ -4,9 +4,10 @@ import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.auth.controller.transformer.AuthControllerTransformer;
 import dev.srello.cocinillas.auth.dto.LoginIDTO;
 import dev.srello.cocinillas.auth.dto.RegisterIDTO;
+import dev.srello.cocinillas.auth.dto.ResetPasswordIDTO;
 import dev.srello.cocinillas.auth.rdto.LoginRQRDTO;
 import dev.srello.cocinillas.auth.rdto.RegisterRQRDTO;
-import dev.srello.cocinillas.auth.rdto.ResendRQRDTO;
+import dev.srello.cocinillas.auth.rdto.ResetPasswordRQRDTO;
 import dev.srello.cocinillas.auth.service.AuthService;
 import dev.srello.cocinillas.user.CurrentUser;
 import dev.srello.cocinillas.user.controller.transformer.UserControllerTransformer;
@@ -32,6 +33,8 @@ public class AuthController {
     public static final String REGISTER_ENDPOINT = "/register";
     public static final String AUTH_ROUTE = "/auth";
     public static final String RESEND_ENDPOINT = "/resend";
+    public static final String FORGOT_ENDPOINT = "/forgot-password";
+    public static final String RESET_ENDPOINT = "/reset-password";
 
     private final AuthService authService;
     private final AuthControllerTransformer authControllerTransformer;
@@ -54,9 +57,9 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@CurrentUser UserODTO userODTO, HttpServletResponse response) {
+    public ResponseEntity<String> logout(@CurrentUser UserODTO userODTO, HttpServletResponse response) {
         authService.logout(userODTO, response);
-        return ok().build();
+        return ok().body("Logout successful");
     }
 
     @GetMapping("/refresh")
@@ -73,9 +76,23 @@ public class AuthController {
         return ok().body(userRSRDTO);
     }
 
-    @PostMapping(RESEND_ENDPOINT)
-    public ResponseEntity<Void> resend(@RequestBody ResendRQRDTO resendRQRDTO) {
-        authService.resendEmail(resendRQRDTO.email());
+    @GetMapping(RESEND_ENDPOINT)
+    public ResponseEntity<Void> resend(@RequestParam String email) {
+        authService.resendEmail(email);
+        return ok().build();
+    }
+
+    @PatchMapping(RESET_ENDPOINT)
+    public ResponseEntity<UserRSRDTO> resetPassword(@RequestBody ResetPasswordRQRDTO resetPasswordRQRDTO, HttpServletResponse response) {
+        ResetPasswordIDTO resetPasswordIDTO = authControllerTransformer.toResetPasswordIDTO(resetPasswordRQRDTO);
+        UserODTO userODTO = authService.resetPassword(resetPasswordIDTO, response);
+        UserRSRDTO userRSRDTO = userControllerTransformer.toRSRDTO(userODTO);
+        return ok().body(userRSRDTO);
+    }
+
+    @GetMapping(FORGOT_ENDPOINT)
+    public ResponseEntity<Void> forgotPassword(@RequestParam String email) {
+        authService.forgotPassword(email);
         return ok().build();
     }
 }

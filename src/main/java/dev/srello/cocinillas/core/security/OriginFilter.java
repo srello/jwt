@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.core.security;
 
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,6 +12,7 @@ import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.ORIGIN_OR_REFERER_HEADER_MISSING_CODE;
 import static dev.srello.cocinillas.core.messages.Messages.Error.ORIGIN_OR_REFERER_HEADER_MISSING;
 import static dev.srello.cocinillas.core.request.RequestConstants.ENDPOINT_ATTRIBUTE;
 import static java.util.Objects.isNull;
@@ -39,7 +40,7 @@ public class OriginFilter implements Filter {
 
         try {
             if (isNull(origin) || isNull(referer))
-                throw new RequestException(BAD_REQUEST, ORIGIN_OR_REFERER_HEADER_MISSING);
+                throw new RequestException(BAD_REQUEST, ORIGIN_OR_REFERER_HEADER_MISSING, ORIGIN_OR_REFERER_HEADER_MISSING_CODE);
         } catch (RequestException ex) {
             handlerExceptionResolver.resolveException((HttpServletRequest) request, (HttpServletResponse) response, null, ex);
             return;

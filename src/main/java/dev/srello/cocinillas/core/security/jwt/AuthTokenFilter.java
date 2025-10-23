@@ -2,7 +2,7 @@ package dev.srello.cocinillas.core.security.jwt;
 
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.cookie.service.CookieService;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.jwt.enums.JwtValidity;
 import dev.srello.cocinillas.jwt.service.JwtService;
 import dev.srello.cocinillas.user.dto.UserODTO;
@@ -16,6 +16,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
@@ -23,6 +25,7 @@ import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map;
 
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.TOKEN_INVALID_CODE;
 import static dev.srello.cocinillas.core.messages.Messages.Error.TOKEN_INVALID;
 import static dev.srello.cocinillas.core.request.RequestConstants.*;
 import static dev.srello.cocinillas.core.security.SecurityConfig.PERMITTED_ENDPOINTS_LIST;
@@ -41,11 +44,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private final HandlerExceptionResolver handlerExceptionResolver;
     private final JwtService jwtService;
     private final UserService userService;
+    private final PathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
         String endpoint = request.getAttribute(ENDPOINT_ATTRIBUTE).toString();
-        if (PERMITTED_ENDPOINTS_LIST.contains(endpoint)) {
+        if (PERMITTED_ENDPOINTS_LIST.stream()
+                .anyMatch(permittedEndpoint -> pathMatcher.match(permittedEndpoint, endpoint))) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -56,7 +61,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         String refreshJwt = cookies.get(REFRESH.name());
 
         if (isBlank(authJwt) || isBlank(signatureJwt)) {
-            filterChain.doFilter(request, response);
+            handlerExceptionResolver.resolveException(request, response, null, new RequestException(UNAUTHORIZED, TOKEN_INVALID, TOKEN_INVALID_CODE));
             return;
         }
 
@@ -66,24 +71,24 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         try {
             JwtValidity jwtValidity = jwtService.verifyJwt(signedJWT);
-            if (jwtValidity.equals(JwtValidity.INVALID) || (jwtValidity.equals(EXPIRED) && !REFRESH_ENDPOINT.equals(endpoint)))
-                throw new RequestException(UNAUTHORIZED, TOKEN_INVALID);
-
-        } catch (RequestException ex) {
-            handlerExceptionResolver.resolveException(request, response, null, ex);
-            return;
+            if (jwtValidity.equals(JwtValidity.INVALID) || (jwtValidity.equals(EXPIRED) && !REFRESH_ENDPOINT.equals(endpoint))) {
+                throw new RequestException(UNAUTHORIZED, TOKEN_INVALID, TOKEN_INVALID_CODE);
+            }
+        } catch (RequestException exception) {
+            handlerExceptionResolver.resolveException(request, response, null, exception);
         }
-
 
         String username = jwtService.getUsernameFromJwtToken(signedJWT);
 
-        UserODTO userODTO = userService.getByUsername(username);
-
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userODTO,
-                null, userODTO.getAuthorities());
-        authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+        try {
+            UserODTO userODTO = userService.getByUsername(username);
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userODTO,
+                    null, userODTO.getAuthorities());
+            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (RequestException exception) {
+            handlerExceptionResolver.resolveException(request, response, null, exception);
+        }
 
         request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, jwt);
 

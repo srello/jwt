@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.user.service;
 
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.user.dto.UserIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
 import dev.srello.cocinillas.user.dto.UserUpdateIDTO;
@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.USER_NOT_FOUND_CODE;
 import static dev.srello.cocinillas.core.messages.Messages.Error.USER_NOT_FOUND;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserODTO getByEmail(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND, USER_NOT_FOUND_CODE));
         return userServiceTransformer.toODTO(user);
     }
 
@@ -55,6 +56,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND));
+        return userRepository.findByUsername(username).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND, USER_NOT_FOUND_CODE));
     }
 }
+/*
+$argon2id$v=19$m=16384,t=2,p=1$1Ms6h90bGReU1DEqLjCeNA$9W4j9edT+fIK2cqbViGwWARG+eUjF4ih5lYzkllsv3E
+
+* */

@@ -12,7 +12,7 @@ import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.jwt.enums.JwtValidity;
 import dev.srello.cocinillas.token.dto.TokenODTO;
 import dev.srello.cocinillas.token.enums.TokenType;
@@ -36,6 +36,7 @@ import static com.nimbusds.jose.JWSAlgorithm.EdDSA;
 import static com.nimbusds.jose.jwk.Curve.Ed25519;
 import static com.nimbusds.jose.jwk.KeyUse.SIGNATURE;
 import static com.nimbusds.jwt.SignedJWT.parse;
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.*;
 import static dev.srello.cocinillas.core.messages.Messages.Error.*;
 import static dev.srello.cocinillas.jwt.enums.JwtValidity.*;
 import static dev.srello.cocinillas.shared.process.HashUtils.hashString;
@@ -52,7 +53,7 @@ import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
     public static final String USER_CLAIMS = "userClaims";
-    public static final String USERNAME_CLAIM = "username";
+    public static final String USERNAME_CLAIM = "email";
     public static final String ROLE_CLAIM = "role";
     public static final String TOKEN_TYPE_CLAIM = "token-type";
     private static final Clock clock = Clock.systemUTC();
@@ -72,7 +73,7 @@ public class JwtServiceImpl implements JwtService {
                     .algorithm(EdDSA)
                     .generate();
         } catch (JOSEException exception) {
-            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, TOKEN_GENERATION_ERROR_CODE);
         }
     }
 
@@ -100,7 +101,7 @@ public class JwtServiceImpl implements JwtService {
             checkArgument(new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime()));
             checkArgument(signedJWT.getJWTClaimsSet().getIssuer().equals(issuerUrl));
         } catch (JOSEException | ParseException exception) {
-            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, TOKEN_GENERATION_ERROR_CODE);
         }
         return signedJWT;
     }
@@ -156,7 +157,7 @@ public class JwtServiceImpl implements JwtService {
             return claims.getExpirationTime().after(currentTime) && LocalDateTime.now().isBefore(token.getExpiresAt()) ? VALID : EXPIRED;
 
         } catch (ParseException | JOSEException ex) {
-            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_VALIDATION_ERROR);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_VALIDATION_ERROR, TOKEN_VALIDATION_ERROR_CODE);
         }
     }
 
@@ -165,7 +166,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             return ((Map<?, ?>) signedJWT.getJWTClaimsSet().getClaim(USER_CLAIMS)).get(USERNAME_CLAIM).toString();
         } catch (ParseException ex) {
-            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, ex);
+            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, TOKEN_INVALID_CODE);
         }
     }
 
@@ -188,14 +189,14 @@ public class JwtServiceImpl implements JwtService {
             JWSSigner signer = new Ed25519Signer(jwk);
             signedJWT.sign(signer);
         } catch (JOSEException exception) {
-            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, TOKEN_GENERATION_ERROR_CODE);
         }
         String s = signedJWT.serialize();
 
         try {
             signedJWT = parse(s);
         } catch (ParseException exception) {
-            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, exception);
+            throw new RequestException(INTERNAL_SERVER_ERROR, TOKEN_GENERATION_ERROR, TOKEN_GENERATION_ERROR_CODE);
         }
 
         return signedJWT;
@@ -203,8 +204,8 @@ public class JwtServiceImpl implements JwtService {
 
     private Map<String, String> getClaims(UserODTO userODTO, TokenType tokenType) {
         return switch (tokenType) {
-            case ANONYMOUS, RECOVERY, SIGNATURE -> new HashMap<>();
-            case AUTHORIZATION, REFRESH, CONFIRM -> getUserFilledClaims(userODTO, tokenType);
+            case ANONYMOUS, SIGNATURE -> new HashMap<>();
+            case AUTHORIZATION, RECOVERY, REFRESH, CONFIRM -> getUserFilledClaims(userODTO, tokenType);
         };
     }
 
@@ -220,7 +221,7 @@ public class JwtServiceImpl implements JwtService {
         try {
             return valueOf(signedJWT.getJWTClaimsSet().getSubject());
         } catch (ParseException exception) {
-            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, exception);
+            throw new RequestException(BAD_REQUEST, TOKEN_INVALID, TOKEN_INVALID_CODE);
         }
     }
 }

@@ -10,7 +10,7 @@ public class Messages {
         public static final String LOGIN_CREDENTIALS_WRONG = "Username/password doesn't match";
         public static final String USER_NOT_FOUND = "User not found";
         public static final String USER_PARAMETERS_ERROR = "Error in user parameters";
-        public static final String USER_PASSWORD_DONT_MATCH = "User+password doesn't match";
+        public static final String USER_PASSWORD_DO_NOT_MATCH = "User+password doesn't match";
         public static final String USER_NOT_ENABLED = "User not enabled";
         public static final String USER_ALREADY_ENABLED = "User already enabled";
         public static final String USER_ADMIN_CANNOT_DELETE_OWN_ACCOUNT = "Admin cannot delete their own account";

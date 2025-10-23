@@ -9,7 +9,7 @@ import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import dev.srello.cocinillas.BaseTestClass;
-import dev.srello.cocinillas.core.exception.RequestException;
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.token.dto.TokenODTO;
 import dev.srello.cocinillas.token.model.Token;
 import dev.srello.cocinillas.token.repository.TokenRepository;
@@ -68,11 +68,11 @@ class TokenServiceTest extends BaseTestClass {
 
     @Test
     void shouldSucceed_deleteAllTokensFromUser() {
-        doNothing().when(tokenRepository).deleteAllTokensFromUser(1);
+        doNothing().when(tokenRepository).deleteAllTokensFromUser(1L);
 
         tokenService.deleteAllTokensFromUser(1L);
 
-        verify(tokenRepository).deleteAllTokensFromUser(1);
+        verify(tokenRepository).deleteAllTokensFromUser(1L);
     }
 
     @Test

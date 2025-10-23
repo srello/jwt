@@ -41,7 +41,16 @@ import static java.util.List.of;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private static final String[] PERMITTED_ENDPOINTS = {AUTH_ROUTE + LOGIN_ENDPOINT, AUTH_ROUTE + REGISTER_ENDPOINT, AUTH_ROUTE + CONFIRM_ENDPOINT, AUTH_ROUTE + RESEND_ENDPOINT, RECIPE_ROUTE, RECIPE_ROUTE + ID_PATH_VARIABLE};
+    private static final String[] PERMITTED_ENDPOINTS = {
+            AUTH_ROUTE + LOGIN_ENDPOINT,
+            AUTH_ROUTE + REGISTER_ENDPOINT,
+            AUTH_ROUTE + CONFIRM_ENDPOINT,
+            AUTH_ROUTE + RESEND_ENDPOINT,
+            AUTH_ROUTE + RESET_ENDPOINT,
+            AUTH_ROUTE + FORGOT_ENDPOINT,
+            RECIPE_ROUTE,
+            RECIPE_ROUTE + ID_PATH_VARIABLE,
+            "/terms.html"};
     public static final List<String> PERMITTED_ENDPOINTS_LIST = of(PERMITTED_ENDPOINTS);
     private final AuthTokenFilter authTokenFilter;
     private final OriginFilter originFilter;
