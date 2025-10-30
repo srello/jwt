@@ -16,14 +16,13 @@ public class Messages {
         public static final String USER_ADMIN_CANNOT_DELETE_OWN_ACCOUNT = "Admin cannot delete their own account";
         public static final String USER_WITH_THIS_EMAIL_EXISTS = "User with this email already exists";
         public static final String USER_NOT_AUTHENTICATED = "User not authenticated";
+        public static final String RESOURCE_DELETION_NOT_ALLOWED = "User can not delete this resource.";
         public static final String TOKEN_GENERATION_ERROR = "Error generating token. Try again later.";
         public static final String TOKEN_VALIDATION_ERROR = "Error generating token. Try again later.";
         public static final String TOKEN_INVALID = "Token invalid";
         public static final String TOKEN_NOT_FOUND = "Token not found";
         public static final String TOKEN_NOT_PARSEABLE = "Token not parseable";
         public static final String ERROR_TOKEN_NOT_PROVIDED = "Please provide auth token";
-        public static final String LOCATION_NOT_FOUND = "Location not found";
-        public static final String SHIFT_NOT_FOUND = "Shift not found";
         public static final String ERROR_CALLING_API = "Error calling API";
         public static final String ERROR_PROCESSING_DATA = "Error processing data";
         public static final String RUNTIME_EXCEPTION = "Runtime exception";
@@ -35,6 +34,8 @@ public class Messages {
 
         //RECIPES
         public static final String RECIPE_NOT_FOUND = "Recipe with id %s not found.";
+        public static final String RECIPE_INTERACTION_ALREADY_EXISTS = "Recipe interaction already exists.";
+        public static final String RECIPE_INTERACTION_NOT_FOUND = "Recipe interaction not found.";
 
     }
 }

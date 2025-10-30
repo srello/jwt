@@ -1,7 +1,7 @@
 package dev.srello.cocinillas.recipe.repository;
 
 import dev.srello.cocinillas.product.model.Product;
-import dev.srello.cocinillas.recipe.dto.RecipeIDTO;
+import dev.srello.cocinillas.recipe.dto.GetRecipesIDTO;
 import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
@@ -27,11 +27,11 @@ import static java.util.Optional.ofNullable;
 public class RecipeSpecificationImpl implements RecipeSpecification {
 
     @Override
-    public Specification<Recipe> buildRecipesPaginatedSpecification(RecipeIDTO recipeIDTO) {
-        Specification<Recipe> nameSpecification = ofNullable(recipeIDTO.getName()).map(this::nameContains).orElse(null);
-        Specification<Recipe> productsSpecification = ofNullable(recipeIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
-        Specification<Recipe> tagsSpecification = ofNullable(recipeIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
-        Specification<Recipe> visibilitySpecification = this.isInVisibilityNotPrivate(recipeIDTO.getVisibility());
+    public Specification<Recipe> buildRecipesPaginatedSpecification(GetRecipesIDTO getRecipesIDTO) {
+        Specification<Recipe> nameSpecification = ofNullable(getRecipesIDTO.getName()).map(this::nameContains).orElse(null);
+        Specification<Recipe> productsSpecification = ofNullable(getRecipesIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
+        Specification<Recipe> tagsSpecification = ofNullable(getRecipesIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
+        Specification<Recipe> visibilitySpecification = this.isInVisibilityNotPrivate(getRecipesIDTO.getVisibility());
 
         return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification)
                 .filter(Objects::nonNull)

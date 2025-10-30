@@ -3,7 +3,6 @@ package dev.srello.cocinillas.user.service;
 import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.user.dto.UserIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
-import dev.srello.cocinillas.user.dto.UserUpdateIDTO;
 import dev.srello.cocinillas.user.model.User;
 import dev.srello.cocinillas.user.repository.UserRepository;
 import dev.srello.cocinillas.user.service.transformer.UserServiceTransformer;
@@ -22,44 +21,36 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final UserRepository userRepository;
-    private final UserServiceTransformer userServiceTransformer;
+    private final UserServiceTransformer transformer;
 
     @Override
     public UserODTO getByUsername(String username) {
-        User user = findByUsername(username);
-        return userServiceTransformer.toODTO(user);
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND, USER_NOT_FOUND_CODE));
+        return transformer.toODTO(user);
     }
 
     @Override
     public UserODTO getByEmail(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND, USER_NOT_FOUND_CODE));
-        return userServiceTransformer.toODTO(user);
+        return transformer.toODTO(user);
     }
 
     @Override
     public UserODTO createUser(UserIDTO userIDTO) {
-        User user = userServiceTransformer.toUser(userIDTO);
+        User user = transformer.toUser(userIDTO);
         User userFromDB = userRepository.saveAndFlush(user);
-        return userServiceTransformer.toODTO(userFromDB);
+        return transformer.toODTO(userFromDB);
     }
 
     @Override
-    public UserODTO updateUser(UserUpdateIDTO userUpdateIDTO) {
-        User user = userServiceTransformer.toUser(userUpdateIDTO);
+    public UserODTO updateUser(UserODTO userODTO) {
+        User user = transformer.toUser(userODTO);
         User userFromDB = userRepository.saveAndFlush(user);
-        return userServiceTransformer.toODTO(userFromDB);
+        return transformer.toODTO(userFromDB);
     }
 
     @Override
     public @NotNull UserDetails loadUserByUsername(@NotNull String username) throws UsernameNotFoundException {
         return getByUsername(username);
     }
-
-    private User findByUsername(String username) {
-        return userRepository.findByUsername(username).orElseThrow(() -> new RequestException(NOT_FOUND, USER_NOT_FOUND, USER_NOT_FOUND_CODE));
-    }
 }
-/*
-$argon2id$v=19$m=16384,t=2,p=1$1Ms6h90bGReU1DEqLjCeNA$9W4j9edT+fIK2cqbViGwWARG+eUjF4ih5lYzkllsv3E
-
-* */

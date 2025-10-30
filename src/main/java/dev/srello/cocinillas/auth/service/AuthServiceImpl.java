@@ -15,7 +15,6 @@ import dev.srello.cocinillas.jwt.service.JwtService;
 import dev.srello.cocinillas.token.service.TokenService;
 import dev.srello.cocinillas.user.dto.UserIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
-import dev.srello.cocinillas.user.dto.UserUpdateIDTO;
 import dev.srello.cocinillas.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -101,8 +100,7 @@ public class AuthServiceImpl implements AuthService {
             throw new RequestException(BAD_REQUEST, USER_ALREADY_ENABLED, USER_ALREADY_ENABLED_CODE);
 
         userODTO.setRole(USER);
-        UserUpdateIDTO userUpdateIDTO = authServiceTransformer.toUserUpdateIDTO(userODTO);
-        UserODTO userODTOUpdated = userService.updateUser(userUpdateIDTO);
+        UserODTO userODTOUpdated = userService.updateUser(userODTO);
 
         generateAuthAndRefreshTokens(userODTOUpdated, response);
 
@@ -133,8 +131,7 @@ public class AuthServiceImpl implements AuthService {
     public UserODTO resetPassword(ResetPasswordIDTO resetPasswordIDTO, HttpServletResponse response) {
         UserODTO userODTO = getUserFromToken(resetPasswordIDTO.getToken());
         userODTO.setPassword(passwordEncoder.encode(resetPasswordIDTO.getPassword()));
-        UserUpdateIDTO userUpdateIDTO = authServiceTransformer.toUserUpdateIDTO(userODTO);
-        UserODTO updatedUser = userService.updateUser(userUpdateIDTO);
+        UserODTO updatedUser = userService.updateUser(userODTO);
         generateAuthAndRefreshTokens(updatedUser, response);
         return updatedUser;
     }

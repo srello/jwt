@@ -16,7 +16,10 @@ public record RecipeRSRDTO(
         List<TagRSRDTO> tags,
         List<URL> imageUrls,
         Integer totalDuration,
-        MacrosRSRDTO macros
+        MacrosRSRDTO macros,
+        Long likes,
+        Boolean isLiked,
+        Boolean isSaved
 
 ) {
 }

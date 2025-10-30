@@ -22,8 +22,7 @@ public class Codes {
         public static final String TOKEN_NOT_FOUND_CODE = "013";
         public static final String TOKEN_NOT_PARSEABLE_CODE = "014";
         public static final String ERROR_TOKEN_NOT_PROVIDED_CODE = "015";
-        public static final String LOCATION_NOT_FOUND_CODE = "016";
-        public static final String SHIFT_NOT_FOUND_CODE = "017";
+        public static final String RESOURCE_DELETION_NOT_ALLOWED_CODE = "016";
         public static final String ERROR_CALLING_API_CODE = "018";
         public static final String ERROR_PROCESSING_DATA_CODE = "019";
         public static final String RUNTIME_EXCEPTION_CODE = "020";
@@ -35,6 +34,9 @@ public class Codes {
 
         //RECIPES
         public static final String RECIPE_NOT_FOUND_CODE = "026";
+        public static final String RECIPE_INTERACTION_ALREADY_EXISTS_CODE = "027";
+        public static final String RECIPE_INTERACTION_NOT_FOUND_CODE = "028";
+
 
     }
 }

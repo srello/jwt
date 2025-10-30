@@ -2,7 +2,6 @@ package dev.srello.cocinillas.user.service.transformer;
 
 import dev.srello.cocinillas.user.dto.UserIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
-import dev.srello.cocinillas.user.dto.UserUpdateIDTO;
 import dev.srello.cocinillas.user.model.User;
 import org.mapstruct.Mapper;
 
@@ -12,5 +11,5 @@ public interface UserServiceMapper {
 
     User toUser(UserIDTO userIDTO);
 
-    User toUser(UserUpdateIDTO userUpdateIDTO);
+    User toUser(UserODTO userUpdateIDTO);
 }

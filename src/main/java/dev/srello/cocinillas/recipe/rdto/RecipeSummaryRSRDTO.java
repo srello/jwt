@@ -8,6 +8,10 @@ public record RecipeSummaryRSRDTO(
         String description,
         List<String> imageUrls,
         Integer totalDuration,
-        Double calories
+        Double calories,
+        Long likes,
+        Boolean isLiked,
+        Boolean isSaved
+
 ) {
 }

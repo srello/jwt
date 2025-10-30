@@ -148,7 +148,7 @@ public class InitializationData {
     private List<Recipe> generateRandomRecipes(Faker faker, List<Product> products) {
         List<Recipe> recipes = new ArrayList<>();
         RecipeVisibility[] recipeVisibilities = RecipeVisibility.values();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < 200; i++) {
             shuffle(products);
             String name = faker.food().dish();
             List<Ingredient> ingredients = products.subList(0, current().nextInt(5, 10))
@@ -167,6 +167,7 @@ public class InitializationData {
                     .imageKeys(of(devImageKeys[current().nextInt(devImageKeys.length)]))
                     .totalDuration(current().nextInt(5, 240))
                     .creationDate(now.minusDays(current().nextLong(60)))
+                    .likes(current().nextLong(1000))
                     .build());
         }
         return recipes;

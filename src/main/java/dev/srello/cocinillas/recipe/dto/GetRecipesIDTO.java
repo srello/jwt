@@ -8,11 +8,11 @@ import java.util.List;
 
 @Getter
 @AllArgsConstructor
-public class RecipeIDTO {
+public class GetRecipesIDTO {
 
-    List<String> tags;
-    List<String> ingredients;
-    RecipeVisibility visibility;
+    private List<String> tags;
+    private List<String> ingredients;
+    private RecipeVisibility visibility;
     private String name;
-
+    private Long userId;
 }

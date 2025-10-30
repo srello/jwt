@@ -3,9 +3,12 @@ package dev.srello.cocinillas.recipe.service.transformer;
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.service.transformer.ProductServiceMapper;
 import dev.srello.cocinillas.recipe.dto.MacrosODTO;
+import dev.srello.cocinillas.recipe.dto.RecipeInteractionIDTO;
+import dev.srello.cocinillas.recipe.dto.RecipeInteractionODTO;
 import dev.srello.cocinillas.recipe.dto.RecipeODTO;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
+import dev.srello.cocinillas.recipe.model.RecipeInteraction;
 import dev.srello.cocinillas.tags.service.transformer.TagServiceMapper;
 import org.jetbrains.annotations.NotNull;
 import org.mapstruct.Mapper;
@@ -36,7 +39,11 @@ public interface RecipeServiceMapper {
     }
 
     @Mapping(target = "macros", source = "recipe.ingredients", qualifiedByName = "getMacrosFromIngredients")
-    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls);
+    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls, Boolean isLiked, Boolean isSaved);
+
+    RecipeInteraction toRecipeInteraction(RecipeInteractionIDTO recipeInteractionIDTO);
+
+    RecipeInteractionODTO toRecipeInteractionODTO(RecipeInteraction recipeInteraction);
 
     @Named("getMacrosFromIngredients")
     default MacrosODTO getMacrosFromIngredients(List<Ingredient> ingredients) {
@@ -53,5 +60,4 @@ public interface RecipeServiceMapper {
                 .collect(Collector.of(MacrosODTO::new, RecipeServiceMapper::mergeMacros, RecipeServiceMapper::mergeMacros)
                 );
     }
-
 }

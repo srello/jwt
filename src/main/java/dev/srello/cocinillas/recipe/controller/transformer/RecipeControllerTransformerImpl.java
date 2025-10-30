@@ -1,10 +1,7 @@
 package dev.srello.cocinillas.recipe.controller.transformer;
 
-import dev.srello.cocinillas.recipe.dto.RecipeIDTO;
-import dev.srello.cocinillas.recipe.dto.RecipeODTO;
-import dev.srello.cocinillas.recipe.rdto.RecipeRQRDTO;
-import dev.srello.cocinillas.recipe.rdto.RecipeRSRDTO;
-import dev.srello.cocinillas.recipe.rdto.RecipeSummaryRSRDTO;
+import dev.srello.cocinillas.recipe.dto.*;
+import dev.srello.cocinillas.recipe.rdto.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,13 +14,8 @@ public class RecipeControllerTransformerImpl implements RecipeControllerTransfor
     private final RecipeControllerMapper mapper;
 
     @Override
-    public RecipeIDTO toRecipeIDTO(@NonNull RecipeRQRDTO recipeRQRDTO) {
-        return mapper.toRecipeIDTO(recipeRQRDTO);
-    }
-
-    @Override
-    public Page<RecipeRSRDTO> toRecipesRSRDTO(@NonNull Page<RecipeODTO> recipesODTO) {
-        return mapper.toRecipesRSRDTO(recipesODTO);
+    public GetRecipesIDTO toGetRecipesIDTO(@NonNull GetRecipesRQRDTO getRecipesRQRDTO) {
+        return mapper.toGetRecipesIDTO(getRecipesRQRDTO);
     }
 
     @Override
@@ -35,4 +27,20 @@ public class RecipeControllerTransformerImpl implements RecipeControllerTransfor
     public Page<RecipeSummaryRSRDTO> toRecipeSummaryRSRDTO(@NonNull Page<RecipeODTO> recipesODTO) {
         return mapper.toRecipeSummaryRSRDTO(recipesODTO);
     }
+
+    @Override
+    public GetRecipeIDTO toGetRecipeIDTO(@NonNull Long id, Long userId) {
+        return mapper.toGetRecipeIDTO(id, userId);
+    }
+
+    @Override
+    public RecipeInteractionIDTO toRecipeInteractionIDTO(@NonNull RecipeInteractionRQRDTO recipeInteractionRQRDTO, @NonNull Long userId) {
+        return mapper.toRecipeInteractionsIDTO(recipeInteractionRQRDTO, userId);
+    }
+
+    @Override
+    public RecipeInteractionRSRDTO toRecipeInteractionRSRDTO(@NonNull RecipeInteractionODTO recipeInteractionODTO) {
+        return mapper.toRecipeInteractionsRSRDTO(recipeInteractionODTO);
+    }
+
 }

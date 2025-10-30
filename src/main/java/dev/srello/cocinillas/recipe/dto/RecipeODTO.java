@@ -22,4 +22,7 @@ public class RecipeODTO {
     private List<URL> imageUrls;
     private Integer totalDuration;
     private MacrosODTO macros;
+    private Long likes;
+    private Boolean isLiked;
+    private Boolean isSaved;
 }

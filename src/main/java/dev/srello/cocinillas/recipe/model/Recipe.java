@@ -60,4 +60,7 @@ public class Recipe {
     @Column(nullable = false)
     private LocalDateTime creationDate;
 
+    @Column
+    private Long likes = 0L;
+
 }

@@ -4,10 +4,11 @@ import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 
 import java.util.List;
 
-public record RecipeRQRDTO(
+public record GetRecipesRQRDTO(
         String name,
         List<String> tags,
         List<String> ingredients,
-        RecipeVisibility visibility
+        RecipeVisibility visibility,
+        Long userId
 ) {
 }
