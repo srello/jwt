@@ -76,6 +76,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             }
         } catch (RequestException exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
+            return;
         }
 
         String username = jwtService.getUsernameFromJwtToken(signedJWT);
@@ -88,6 +89,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (RequestException exception) {
             handlerExceptionResolver.resolveException(request, response, null, exception);
+            return;
         }
 
         request.setAttribute(AUTHORIZATION_REQUEST_ATTRIBUTE, jwt);

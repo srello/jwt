@@ -31,6 +31,13 @@ public class RecipeServiceTransformerImpl implements RecipeServiceTransformer {
     }
 
     @Override
+    public List<RecipeODTO> toRecipesODTO(@NonNull List<Recipe> recipes, @NonNull List<RecipeInteraction> recipeInteractions) {
+        return recipes.stream()
+                .map(recipe -> toRecipeODTO(recipe, recipeInteractions))
+                .toList();
+    }
+
+    @Override
     public RecipeODTO toRecipeODTO(@NonNull Recipe recipe, @NotNull List<RecipeInteraction> recipeInteractions) {
         List<URL> imageUrls = recipe.getImageKeys().stream()
                 .map(storageService::getPresignedGetURL)

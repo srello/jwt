@@ -1,30 +1,35 @@
-package dev.srello.cocinillas.recipe.repository;
+package dev.srello.cocinillas.recipe.service;
 
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.recipe.dto.GetRecipesIDTO;
 import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
+import dev.srello.cocinillas.recipe.model.RecipeInteraction;
 import dev.srello.cocinillas.tags.model.Tag;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.Subquery;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.SAVE;
 import static dev.srello.cocinillas.recipe.enums.RecipeVisibility.*;
 import static jakarta.persistence.criteria.JoinType.LEFT;
+import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class RecipeSpecificationImpl implements RecipeSpecification {
+public class RecipeSpecificationServiceImpl implements RecipeSpecificationService {
 
     @Override
     public Specification<Recipe> buildRecipesPaginatedSpecification(GetRecipesIDTO getRecipesIDTO) {
@@ -32,8 +37,12 @@ public class RecipeSpecificationImpl implements RecipeSpecification {
         Specification<Recipe> productsSpecification = ofNullable(getRecipesIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
         Specification<Recipe> tagsSpecification = ofNullable(getRecipesIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
         Specification<Recipe> visibilitySpecification = this.isInVisibilityNotPrivate(getRecipesIDTO.getVisibility());
+        Specification<Recipe> onlyUserRecipesSpecification = ofNullable(getRecipesIDTO.getUserId())
+                .filter(userId -> TRUE.equals(getRecipesIDTO.getOnlyUserRecipes()))
+                .map(this::isOnlyUserRecipes)
+                .orElse(null);
 
-        return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification)
+        return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification, onlyUserRecipesSpecification)
                 .filter(Objects::nonNull)
                 .reduce(Specification::and)
                 .orElse(visibilitySpecification);
@@ -96,6 +105,21 @@ public class RecipeSpecificationImpl implements RecipeSpecification {
             }
 
             return inClause;
+        };
+    }
+
+    private Specification<Recipe> isOnlyUserRecipes(Long userId) {
+        return (recipeTable, query, cb) -> {
+            Predicate isAuthor = cb.equal(recipeTable.get("author").get("id"), userId);
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<RecipeInteraction> interaction = subquery.from(RecipeInteraction.class);
+            subquery.select(interaction.get("recipeId"))
+                    .where(
+                            cb.equal(interaction.get("userId"), userId),
+                            cb.equal(interaction.get("type"), SAVE)
+                    );
+            Predicate isSaved = recipeTable.get("id").in(subquery);
+            return cb.or(isAuthor, isSaved);
         };
     }
 }

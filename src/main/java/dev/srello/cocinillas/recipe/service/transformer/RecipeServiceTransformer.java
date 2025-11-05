@@ -14,6 +14,8 @@ import java.util.List;
 public interface RecipeServiceTransformer {
     Page<RecipeODTO> toRecipesODTO(@NonNull Page<Recipe> recipes, @NonNull List<RecipeInteraction> recipeInteractions);
 
+    List<RecipeODTO> toRecipesODTO(@NonNull List<Recipe> recipes, @NonNull List<RecipeInteraction> recipeInteractions);
+
     RecipeODTO toRecipeODTO(@NonNull Recipe recipe, @NotNull List<RecipeInteraction> recipeInteractions);
 
     RecipeInteraction toRecipeInteraction(@NonNull RecipeInteractionIDTO recipeInteractionIDTO);

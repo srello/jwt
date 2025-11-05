@@ -42,7 +42,7 @@ public class RecipeController {
     }
 
     @GetMapping(ID_PATH_VARIABLE)
-    public ResponseEntity<RecipeRSRDTO> getRecipeById(@PathVariable Long id, @RequestParam Long userId) {
+    public ResponseEntity<RecipeRSRDTO> getRecipeById(@PathVariable Long id, @RequestParam(required = false) Long userId) {
         GetRecipeIDTO getRecipeIDTO = transformer.toGetRecipeIDTO(id, userId);
         RecipeODTO recipeODTO = service.getRecipeById(getRecipeIDTO);
         RecipeRSRDTO recipeRSRDTO = transformer.toRecipeRSRDTO(recipeODTO);

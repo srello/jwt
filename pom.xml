@@ -44,6 +44,7 @@
         <mustache.version>0.9.14</mustache.version>
         <faker.version>1.0.2</faker.version>
         <s3.version>2.20.52</s3.version>
+        <commons-lang.version>3.19.0</commons-lang.version>
     </properties>
     <dependencies>
         <dependency>
@@ -169,6 +170,12 @@
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
             <version>${s3.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons-lang.version}</version>
         </dependency>
 
     </dependencies>

@@ -4,10 +4,14 @@ import dev.srello.cocinillas.recipe.dto.*;
 import dev.srello.cocinillas.shared.pagination.dto.PaginationIDTO;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface RecipeService {
     Page<RecipeODTO> getRecipesPaginated(GetRecipesIDTO getRecipesIDTO, PaginationIDTO pagination);
 
     RecipeODTO getRecipeById(GetRecipeIDTO getRecipeIDTO);
+
+    List<RecipeODTO> getRecipesById(GetRecipesByIdIDTO getRecipesByIdIDTO);
 
     RecipeInteractionODTO createRecipeInteraction(RecipeInteractionIDTO saveRecipeIDTO);
 

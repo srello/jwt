@@ -6,7 +6,6 @@ import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.model.RecipeInteraction;
 import dev.srello.cocinillas.recipe.repository.RecipeInteractionRepository;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
-import dev.srello.cocinillas.recipe.repository.RecipeSpecification;
 import dev.srello.cocinillas.recipe.service.transformer.RecipeServiceTransformer;
 import dev.srello.cocinillas.shared.pagination.dto.PaginationIDTO;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +29,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class RecipeServiceImpl implements RecipeService {
 
     private final RecipeServiceTransformer transformer;
-    private final RecipeSpecification specification;
+    private final RecipeSpecificationService specification;
     private final RecipeRepository repository;
     private final RecipeInteractionRepository recipeInteractionRepository;
 
@@ -49,6 +48,13 @@ public class RecipeServiceImpl implements RecipeService {
         Recipe recipe = findRecipeById(getRecipeIDTO.getId());
         List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(of(recipe), getRecipeIDTO.getUserId());
         return transformer.toRecipeODTO(recipe, recipeInteractions);
+    }
+
+    @Override
+    public List<RecipeODTO> getRecipesById(GetRecipesByIdIDTO getRecipesByIdIDTO) {
+        List<Recipe> recipes = repository.findAllById(getRecipesByIdIDTO.getRecipeIds());
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes, getRecipesByIdIDTO.getUserId());
+        return transformer.toRecipesODTO(recipes, recipeInteractions);
     }
 
     @Override

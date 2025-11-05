@@ -1,9 +1,9 @@
-package dev.srello.cocinillas.recipe.repository;
+package dev.srello.cocinillas.recipe.service;
 
 import dev.srello.cocinillas.recipe.dto.GetRecipesIDTO;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import org.springframework.data.jpa.domain.Specification;
 
-public interface RecipeSpecification {
+public interface RecipeSpecificationService {
     Specification<Recipe> buildRecipesPaginatedSpecification(GetRecipesIDTO getRecipesIDTO);
 }

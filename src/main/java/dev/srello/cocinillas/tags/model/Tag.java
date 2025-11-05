@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.tags.model;
 
+import dev.srello.cocinillas.tags.enums.TagType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -25,6 +27,9 @@ public class Tag {
     @Column(nullable = false)
     private String name;
 
-    @ManyToMany
-    private List<TagType> tagTypes;
+    @ElementCollection(targetClass = TagType.class, fetch = EAGER)
+    @CollectionTable(name = "tag_tag_types", joinColumns = @JoinColumn(name = "tag_id"))
+    @Column(name = "type")
+    @Enumerated()
+    private List<TagType> types;
 }

@@ -2,6 +2,7 @@ package dev.srello.cocinillas.recipe.model;
 
 import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.tags.model.Tag;
+import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,5 +63,9 @@ public class Recipe {
 
     @Column
     private Long likes = 0L;
+
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
 }

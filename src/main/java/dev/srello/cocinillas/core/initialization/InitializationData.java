@@ -11,9 +11,7 @@ import dev.srello.cocinillas.recipe.model.Instruction;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
 import dev.srello.cocinillas.tags.model.Tag;
-import dev.srello.cocinillas.tags.model.TagType;
 import dev.srello.cocinillas.tags.repository.TagRepository;
-import dev.srello.cocinillas.tags.repository.TagTypeRepository;
 import dev.srello.cocinillas.unit.enums.Unit;
 import dev.srello.cocinillas.unit.model.UnitConversion;
 import dev.srello.cocinillas.user.model.User;
@@ -30,6 +28,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static dev.srello.cocinillas.tags.enums.TagType.values;
 import static dev.srello.cocinillas.user.enums.Role.ADMIN;
 import static dev.srello.cocinillas.user.enums.Role.USER;
 import static java.time.LocalDateTime.now;
@@ -45,7 +44,6 @@ public class InitializationData {
     private final ProductRepository productRepository;
     private final RecipeRepository recipeRepository;
     private final TagRepository tagRepository;
-    private final TagTypeRepository tagTypeRepository;
     private final PasswordEncoder passwordEncoder;
     private final String[] devImageKeys = {"carbonara.png", "ensalada cesar.png", "paella.png", "reina pepiada.png", "verduras thai.jpg"};
     @Value("${LOAD_INITIAL_DATA:false}")
@@ -62,15 +60,13 @@ public class InitializationData {
 
         Faker faker = new Faker();
 
-        userRepository.saveAllAndFlush(generateUsers());
+        List<User> users = userRepository.saveAllAndFlush(generateUsers());
 
-        List<TagType> tagTypes = tagTypeRepository.saveAllAndFlush(generateTagTypes());
-
-        tagRepository.saveAllAndFlush(generateRandomTags(faker, tagTypes));
+        tagRepository.saveAllAndFlush(generateRandomTags(faker));
 
         List<Product> ingredients = productRepository.saveAllAndFlush(generateRandomIngredients(faker));
 
-        recipeRepository.saveAllAndFlush(generateRandomRecipes(faker, ingredients));
+        recipeRepository.saveAllAndFlush(generateRandomRecipes(faker, ingredients, users));
 
 
     }
@@ -96,27 +92,13 @@ public class InitializationData {
         return of(admin, user);
     }
 
-    private List<TagType> generateTagTypes() {
-        TagType recipeTagType = TagType.builder()
-                .name("recipe")
-                .build();
-        TagType ingredientTagType = TagType.builder()
-                .name("ingredient")
-                .build();
-        TagType menuTagType = TagType.builder()
-                .name("menu")
-                .build();
-        return of(recipeTagType, ingredientTagType, menuTagType);
-    }
-
-    private List<Tag> generateRandomTags(Faker faker, List<TagType> tagTypes) {
+    private List<Tag> generateRandomTags(Faker faker) {
         List<Tag> tags = new ArrayList<>();
 
         for (int i = 0; i < 50; i++) {
-            shuffle(tagTypes);
             tags.add(Tag.builder()
                     .name(faker.funnyName().name())
-                    .tagTypes(of(tagTypes.getFirst()))
+                    .types(of(values()[current().nextInt(values().length)]))
                     .build());
         }
         return tags;
@@ -145,7 +127,7 @@ public class InitializationData {
         return ingredients;
     }
 
-    private List<Recipe> generateRandomRecipes(Faker faker, List<Product> products) {
+    private List<Recipe> generateRandomRecipes(Faker faker, List<Product> products, List<User> users) {
         List<Recipe> recipes = new ArrayList<>();
         RecipeVisibility[] recipeVisibilities = RecipeVisibility.values();
         for (int i = 0; i < 200; i++) {
@@ -168,6 +150,7 @@ public class InitializationData {
                     .totalDuration(current().nextInt(5, 240))
                     .creationDate(now.minusDays(current().nextLong(60)))
                     .likes(current().nextLong(1000))
+                    .author(users.get(current().nextInt(users.size())))
                     .build());
         }
         return recipes;

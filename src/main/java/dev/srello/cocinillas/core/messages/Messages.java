@@ -37,5 +37,12 @@ public class Messages {
         public static final String RECIPE_INTERACTION_ALREADY_EXISTS = "Recipe interaction already exists.";
         public static final String RECIPE_INTERACTION_NOT_FOUND = "Recipe interaction not found.";
 
+        //MEALS
+        public static final String MEAL_NOT_FOUND = "Meal not found.";
+
+        //TAGS
+        public static final String TAG_NOT_FOUND = "Tag not found.";
+
+
     }
 }

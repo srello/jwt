@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.tags.dto;
 
+import dev.srello.cocinillas.tags.enums.TagType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,5 +14,5 @@ public class TagODTO {
 
     private String name;
 
-    private List<TagTypeODTO> tagTypes;
+    private List<TagType> types;
 }
