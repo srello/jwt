@@ -9,7 +9,6 @@ public record GetRecipesRQRDTO(
         List<String> tags,
         List<String> ingredients,
         RecipeVisibility visibility,
-        Long userId,
-        Boolean onlyUserRecipes
+        Long userId
 ) {
 }

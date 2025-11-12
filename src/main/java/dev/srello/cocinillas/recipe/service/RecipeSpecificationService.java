@@ -6,4 +6,6 @@ import org.springframework.data.jpa.domain.Specification;
 
 public interface RecipeSpecificationService {
     Specification<Recipe> buildRecipesPaginatedSpecification(GetRecipesIDTO getRecipesIDTO);
+
+    Specification<Recipe> buildUserRecipesPaginatedSpecification(Long userId);
 }

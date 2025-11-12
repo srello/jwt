@@ -9,6 +9,8 @@ import java.util.List;
 public interface RecipeService {
     Page<RecipeODTO> getRecipesPaginated(GetRecipesIDTO getRecipesIDTO, PaginationIDTO pagination);
 
+    Page<RecipeODTO> getUserRecipesPaginated(Long id, PaginationIDTO paginationIDTO);
+
     RecipeODTO getRecipeById(GetRecipeIDTO getRecipeIDTO);
 
     List<RecipeODTO> getRecipesById(GetRecipesByIdIDTO getRecipesByIdIDTO);

@@ -1,7 +1,9 @@
 package dev.srello.cocinillas.menu.controller.transformer;
 
+import dev.srello.cocinillas.menu.dto.GetMenusIDTO;
 import dev.srello.cocinillas.menu.dto.MenuIDTO;
 import dev.srello.cocinillas.menu.dto.MenuODTO;
+import dev.srello.cocinillas.menu.rdto.GetMenusRQRDTO;
 import dev.srello.cocinillas.menu.rdto.MenuRQRDTO;
 import dev.srello.cocinillas.menu.rdto.MenuRSRDTO;
 import dev.srello.cocinillas.tags.controller.transformer.TagControllerMapper;
@@ -15,4 +17,6 @@ public interface MenuControllerMapper {
     MenuIDTO toMenuIDTO(MenuRQRDTO menu, UserODTO author);
 
     MenuRSRDTO toMenuRSRDTO(MenuODTO menuODTO);
+
+    GetMenusIDTO toGetMenusIDTO(GetMenusRQRDTO getMenusRQRDTO, Long userId);
 }

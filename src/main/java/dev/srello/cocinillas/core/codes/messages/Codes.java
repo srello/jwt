@@ -42,5 +42,8 @@ public class Codes {
 
         //TAGS
         public static final String TAG_NOT_FOUND_CODE = "030";
+
+        //MENUS
+        public static final String MENU_NOT_FOUND_CODE = "031";
     }
 }

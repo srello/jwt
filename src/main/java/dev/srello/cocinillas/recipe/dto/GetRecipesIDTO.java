@@ -15,5 +15,4 @@ public class GetRecipesIDTO {
     private RecipeVisibility visibility;
     private String name;
     private Long userId;
-    private Boolean onlyUserRecipes;
 }

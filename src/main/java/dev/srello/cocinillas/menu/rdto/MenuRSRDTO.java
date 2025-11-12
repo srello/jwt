@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.menu.rdto;
 
+import dev.srello.cocinillas.menu.enums.MenuVisibility;
 import dev.srello.cocinillas.tags.rdto.TagRSRDTO;
 import dev.srello.cocinillas.user.model.User;
 
@@ -10,6 +11,8 @@ public record MenuRSRDTO(
         String name,
         List<MenuMealRSRDTO> menuMeals,
         User author,
-        List<TagRSRDTO> tags
+        List<TagRSRDTO> tags,
+        Long likes,
+        MenuVisibility visibility
 ) {
 }

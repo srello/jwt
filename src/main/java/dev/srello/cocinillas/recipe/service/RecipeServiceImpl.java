@@ -44,6 +44,14 @@ public class RecipeServiceImpl implements RecipeService {
     }
 
     @Override
+    public Page<RecipeODTO> getUserRecipesPaginated(Long userId, PaginationIDTO paginationIDTO) {
+        Specification<Recipe> recipeSpecification = specification.buildUserRecipesPaginatedSpecification(userId);
+        Page<Recipe> recipes = repository.findAll(recipeSpecification, paginationIDTO.getPageRequest());
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes.stream().toList(), userId);
+        return transformer.toRecipesODTO(recipes, recipeInteractions);
+    }
+
+    @Override
     public RecipeODTO getRecipeById(GetRecipeIDTO getRecipeIDTO) {
         Recipe recipe = findRecipeById(getRecipeIDTO.getId());
         List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(of(recipe), getRecipeIDTO.getUserId());

@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.menu.model;
 
+import dev.srello.cocinillas.menu.enums.MenuVisibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
@@ -38,4 +39,10 @@ public class Menu {
 
     @ManyToMany(fetch = EAGER)
     private List<Tag> tags;
+
+    @Column
+    private Long likes = 0L;
+
+    @Column
+    private MenuVisibility visibility;
 }

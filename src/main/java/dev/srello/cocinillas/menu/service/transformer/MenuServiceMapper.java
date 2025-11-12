@@ -10,5 +10,5 @@ import org.mapstruct.Mapper;
 public interface MenuServiceMapper {
     Menu toMenu(MenuIDTO menuIDTO);
 
-    MenuODTO toMenuODTO(Menu menu);
+    MenuODTO toMenuODTO(Menu menu, Boolean isLiked, Boolean isSaved);
 }

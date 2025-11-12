@@ -43,6 +43,9 @@ public class Messages {
         //TAGS
         public static final String TAG_NOT_FOUND = "Tag not found.";
 
+        //MENUS
+        public static final String MENU_NOT_FOUND = "Menu not found.";
+
 
     }
 }

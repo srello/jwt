@@ -23,7 +23,6 @@ import java.util.stream.Stream;
 import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.SAVE;
 import static dev.srello.cocinillas.recipe.enums.RecipeVisibility.*;
 import static jakarta.persistence.criteria.JoinType.LEFT;
-import static java.lang.Boolean.TRUE;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
@@ -36,16 +35,28 @@ public class RecipeSpecificationServiceImpl implements RecipeSpecificationServic
         Specification<Recipe> nameSpecification = ofNullable(getRecipesIDTO.getName()).map(this::nameContains).orElse(null);
         Specification<Recipe> productsSpecification = ofNullable(getRecipesIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
         Specification<Recipe> tagsSpecification = ofNullable(getRecipesIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
-        Specification<Recipe> visibilitySpecification = this.isInVisibilityNotPrivate(getRecipesIDTO.getVisibility());
-        Specification<Recipe> onlyUserRecipesSpecification = ofNullable(getRecipesIDTO.getUserId())
-                .filter(userId -> TRUE.equals(getRecipesIDTO.getOnlyUserRecipes()))
-                .map(this::isOnlyUserRecipes)
-                .orElse(null);
+        Specification<Recipe> visibilitySpecification = isInVisibilityNotPrivate(getRecipesIDTO.getVisibility());
 
-        return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification, onlyUserRecipesSpecification)
+        return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification)
                 .filter(Objects::nonNull)
                 .reduce(Specification::and)
                 .orElse(visibilitySpecification);
+    }
+
+    @Override
+    public Specification<Recipe> buildUserRecipesPaginatedSpecification(Long userId) {
+        return (recipeTable, query, cb) -> {
+            Predicate isAuthor = cb.equal(recipeTable.get("author").get("id"), userId);
+            Subquery<Long> subquery = query.subquery(Long.class);
+            Root<RecipeInteraction> interaction = subquery.from(RecipeInteraction.class);
+            subquery.select(interaction.get("recipeId"))
+                    .where(
+                            cb.equal(interaction.get("userId"), userId),
+                            cb.equal(interaction.get("type"), SAVE)
+                    );
+            Predicate isSaved = recipeTable.get("id").in(subquery);
+            return cb.or(isAuthor, isSaved);
+        };
     }
 
     private Specification<Recipe> nameContains(String filterString) {
@@ -105,21 +116,6 @@ public class RecipeSpecificationServiceImpl implements RecipeSpecificationServic
             }
 
             return inClause;
-        };
-    }
-
-    private Specification<Recipe> isOnlyUserRecipes(Long userId) {
-        return (recipeTable, query, cb) -> {
-            Predicate isAuthor = cb.equal(recipeTable.get("author").get("id"), userId);
-            Subquery<Long> subquery = query.subquery(Long.class);
-            Root<RecipeInteraction> interaction = subquery.from(RecipeInteraction.class);
-            subquery.select(interaction.get("recipeId"))
-                    .where(
-                            cb.equal(interaction.get("userId"), userId),
-                            cb.equal(interaction.get("type"), SAVE)
-                    );
-            Predicate isSaved = recipeTable.get("id").in(subquery);
-            return cb.or(isAuthor, isSaved);
         };
     }
 }

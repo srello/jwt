@@ -41,6 +41,15 @@ public class RecipeController {
         return ok().body(recipeSummaryRSRDTO);
     }
 
+    @GetMapping("/private")
+    public ResponseEntity<Page<RecipeSummaryRSRDTO>> getUserRecipesPaginated(@Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
+        PaginationIDTO paginationIDTO = paginationTransformer.toPaginationIDTO(paginationRQRDTO);
+        Page<RecipeODTO> recipesSummariesODTO = service.getUserRecipesPaginated(currentUser.getId(), paginationIDTO);
+        Page<RecipeSummaryRSRDTO> recipeSummaryRSRDTO = transformer.toRecipeSummaryRSRDTO(recipesSummariesODTO);
+
+        return ok().body(recipeSummaryRSRDTO);
+    }
+
     @GetMapping(ID_PATH_VARIABLE)
     public ResponseEntity<RecipeRSRDTO> getRecipeById(@PathVariable Long id, @RequestParam(required = false) Long userId) {
         GetRecipeIDTO getRecipeIDTO = transformer.toGetRecipeIDTO(id, userId);
