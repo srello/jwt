@@ -7,5 +7,5 @@ import org.springframework.data.jpa.domain.Specification;
 public interface MenuSpecificationService {
     Specification<Menu> buildMenusPaginatedSpecification(GetMenusIDTO getMenusIDTO);
 
-    Specification<Menu> buildUserMenusPaginatedSpecification(Long userId);
+    Specification<Menu> buildUserMenusPaginatedSpecification(GetMenusIDTO getMenusIDTO);
 }

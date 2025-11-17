@@ -1,24 +1,24 @@
 package dev.srello.cocinillas.meal.service;
 
 import dev.srello.cocinillas.core.exception.custom.RequestException;
-import dev.srello.cocinillas.meal.dto.DeleteMealIDTO;
-import dev.srello.cocinillas.meal.dto.GetMealsIDTO;
-import dev.srello.cocinillas.meal.dto.MealIDTO;
-import dev.srello.cocinillas.meal.dto.MealODTO;
+import dev.srello.cocinillas.meal.dto.*;
 import dev.srello.cocinillas.meal.model.Meal;
 import dev.srello.cocinillas.meal.repository.MealRepository;
 import dev.srello.cocinillas.meal.service.transformer.MealServiceTransformer;
-import dev.srello.cocinillas.recipe.dto.GetRecipeIDTO;
-import dev.srello.cocinillas.recipe.dto.GetRecipesByIdIDTO;
+import dev.srello.cocinillas.recipe.adapter.RecipeServiceAdapter;
 import dev.srello.cocinillas.recipe.dto.RecipeODTO;
-import dev.srello.cocinillas.recipe.service.RecipeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.MEALS_CAN_NOT_BE_EMPTY_CODE;
 import static dev.srello.cocinillas.core.codes.messages.Codes.Error.MEAL_NOT_FOUND_CODE;
+import static dev.srello.cocinillas.core.messages.Messages.Error.MEALS_CAN_NOT_BE_EMPTY;
 import static dev.srello.cocinillas.core.messages.Messages.Error.MEAL_NOT_FOUND;
+import static java.util.Collections.emptyList;
+import static java.util.List.of;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @Service
@@ -26,15 +26,25 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 public class MealServiceImpl implements MealService {
     private final MealRepository repository;
     private final MealServiceTransformer transformer;
-    private final RecipeService recipeService;
+    private final RecipeServiceAdapter recipeServiceAdapter;
 
     @Override
     public MealODTO createMeal(MealIDTO mealIDTO) {
         Meal meal = transformer.toMeal(mealIDTO);
         Meal savedMeal = repository.saveAndFlush(meal);
-        GetRecipeIDTO getRecipeIDTO = transformer.toGetRecipeIDTO(mealIDTO);
-        RecipeODTO recipeODTO = recipeService.getRecipeById(getRecipeIDTO);
-        return transformer.toMealODTO(savedMeal, recipeODTO);
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(of(meal), mealIDTO.getUserId());
+        return transformer.toMealODTO(savedMeal, recipes);
+    }
+
+    @Override
+    public List<MealODTO> createMeals(List<MealIDTO> mealsIDTO) {
+        if (mealsIDTO.isEmpty())
+            throw new RequestException(BAD_REQUEST, MEALS_CAN_NOT_BE_EMPTY, MEALS_CAN_NOT_BE_EMPTY_CODE);
+
+        List<Meal> meals = transformer.toMeals(mealsIDTO);
+        List<Meal> savedMeals = repository.saveAllAndFlush(meals);
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(savedMeals, mealsIDTO.getFirst().getUserId());
+        return transformer.toMealsODTO(savedMeals, recipes);
     }
 
     @Override
@@ -47,10 +57,17 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public List<MealODTO> getMeals(GetMealsIDTO getMealsIDTO) {
-        List<Meal> meals = repository.findByUserIdAndDateTimeBetweenOrderByDateTime(getMealsIDTO.getUserId(), getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
-        List<Long> recipeIds = meals.stream().map(Meal::getRecipeId).distinct().toList();
-        GetRecipesByIdIDTO getRecipesByIdIDTO = transformer.toGetRecipesByIdIDTO(recipeIds, getMealsIDTO.getUserId());
-        List<RecipeODTO> recipesODTO = recipeService.getRecipesById(getRecipesByIdIDTO);
-        return transformer.toMealsODTO(meals, recipesODTO);
+        Long userId = getMealsIDTO.getUserId();
+        List<Meal> meals = repository.findByUserIdAndDateTimeBetweenOrderByDateTime(userId, getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(meals, userId);
+        return transformer.toMealsODTO(meals, recipes);
+    }
+
+    @Override
+    public List<MealODTO> deleteMeals(DeleteMealsIDTO deleteMealsIDTO) {
+        Long userId = deleteMealsIDTO.getUserId();
+        List<Meal> meals = repository.findByUserIdAndDateTimeBetween(userId, deleteMealsIDTO.getStartDateTime(), deleteMealsIDTO.getEndDateTime());
+        repository.deleteAll(meals);
+        return transformer.toMealsODTO(meals, emptyList());
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.ME_PATH_VARIABLE;
 import static dev.srello.cocinillas.recipe.controller.RecipeController.RECIPE_ROUTE;
 import static org.springframework.http.ResponseEntity.ok;
 
@@ -41,7 +42,7 @@ public class RecipeController {
         return ok().body(recipeSummaryRSRDTO);
     }
 
-    @GetMapping("/private")
+    @GetMapping(ME_PATH_VARIABLE)
     public ResponseEntity<Page<RecipeSummaryRSRDTO>> getUserRecipesPaginated(@Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
         PaginationIDTO paginationIDTO = paginationTransformer.toPaginationIDTO(paginationRQRDTO);
         Page<RecipeODTO> recipesSummariesODTO = service.getUserRecipesPaginated(currentUser.getId(), paginationIDTO);

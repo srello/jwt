@@ -1,10 +1,8 @@
 package dev.srello.cocinillas.meal.controller;
 
 import dev.srello.cocinillas.meal.controller.transformer.MealControllerTransformer;
-import dev.srello.cocinillas.meal.dto.DeleteMealIDTO;
-import dev.srello.cocinillas.meal.dto.GetMealsIDTO;
-import dev.srello.cocinillas.meal.dto.MealIDTO;
-import dev.srello.cocinillas.meal.dto.MealODTO;
+import dev.srello.cocinillas.meal.dto.*;
+import dev.srello.cocinillas.meal.rdto.DeleteMealsRQRDTO;
 import dev.srello.cocinillas.meal.rdto.GetMealsRQRDTO;
 import dev.srello.cocinillas.meal.rdto.MealRQRDTO;
 import dev.srello.cocinillas.meal.rdto.MealRSRDTO;
@@ -19,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.MULTIPLE_PATH_VARIABLE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -33,7 +33,7 @@ public class MealController {
         GetMealsIDTO getMealsIDTO = transformer.toGetMealsIDTO(getMealsRQRDTO, currentUser.getId());
         List<MealODTO> mealsODTO = service.getMeals(getMealsIDTO);
         List<MealRSRDTO> mealsRSRDTO = transformer.toMealsRSRDTO(mealsODTO);
-        return ok().body(mealsRSRDTO);
+        return ok(mealsRSRDTO);
     }
 
     @PostMapping
@@ -41,14 +41,31 @@ public class MealController {
         MealIDTO mealIDTO = transformer.toMealIDTO(mealRQRDTO, currentUser.getId());
         MealODTO mealODTO = service.createMeal(mealIDTO);
         MealRSRDTO mealRSRDTO = transformer.toMealRSRDTO(mealODTO);
-        return ok().body(mealRSRDTO);
+        return ok(mealRSRDTO);
     }
 
-    @DeleteMapping("/{id}")
+    @PostMapping(MULTIPLE_PATH_VARIABLE)
+    public ResponseEntity<List<MealRSRDTO>> createMeals(@RequestBody List<MealRQRDTO> mealRQRDTO, @CurrentUser UserODTO currentUser) {
+        List<MealIDTO> mealIDTO = transformer.toMealsIDTO(mealRQRDTO, currentUser.getId());
+        List<MealODTO> mealsODTO = service.createMeals(mealIDTO);
+        List<MealRSRDTO> mealsRSRDTO = transformer.toMealsRSRDTO(mealsODTO);
+        return ok(mealsRSRDTO);
+    }
+
+    @DeleteMapping(ID_PATH_VARIABLE)
     public ResponseEntity<MealRSRDTO> deleteMeal(@PathVariable Long id, @CurrentUser UserODTO currentUser) {
         DeleteMealIDTO deleteMealIDTO = transformer.toDeleteMealIDTO(id, currentUser.getId());
         MealODTO mealODTO = service.deleteMeal(deleteMealIDTO);
         MealRSRDTO mealRSRDTO = transformer.toMealRSRDTO(mealODTO);
-        return ok().body(mealRSRDTO);
+        return ok(mealRSRDTO);
     }
+
+    @DeleteMapping(MULTIPLE_PATH_VARIABLE)
+    public ResponseEntity<List<MealRSRDTO>> deleteMeals(@Valid DeleteMealsRQRDTO deleteMealsRQRDTO, @CurrentUser UserODTO currentUser) {
+        DeleteMealsIDTO deleteMealsIDTO = transformer.toDeleteMealsIDTO(deleteMealsRQRDTO, currentUser.getId());
+        List<MealODTO> mealsODTO = service.deleteMeals(deleteMealsIDTO);
+        List<MealRSRDTO> mealsRSRDTO = transformer.toMealsRSRDTO(mealsODTO);
+        return ok(mealsRSRDTO);
+    }
+
 }

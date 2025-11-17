@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import static dev.srello.cocinillas.core.request.RequestConstants.ME_PATH_VARIABLE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -19,7 +20,7 @@ public class UserController {
 
     private final UserControllerTransformer transformer;
 
-    @GetMapping("/me")
+    @GetMapping(ME_PATH_VARIABLE)
     public ResponseEntity<UserRSRDTO> getMyUser(@CurrentUser UserODTO userODTO) {
         UserRSRDTO userRSRDTO = transformer.toRSRDTO(userODTO);
 

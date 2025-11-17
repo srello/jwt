@@ -1,9 +1,7 @@
 package dev.srello.cocinillas.meal.controller.transformer;
 
-import dev.srello.cocinillas.meal.dto.DeleteMealIDTO;
-import dev.srello.cocinillas.meal.dto.GetMealsIDTO;
-import dev.srello.cocinillas.meal.dto.MealIDTO;
-import dev.srello.cocinillas.meal.dto.MealODTO;
+import dev.srello.cocinillas.meal.dto.*;
+import dev.srello.cocinillas.meal.rdto.DeleteMealsRQRDTO;
 import dev.srello.cocinillas.meal.rdto.GetMealsRQRDTO;
 import dev.srello.cocinillas.meal.rdto.MealRQRDTO;
 import dev.srello.cocinillas.meal.rdto.MealRSRDTO;
@@ -23,4 +21,6 @@ public interface MealControllerMapper {
     GetMealsIDTO toGetMealsIDTO(GetMealsRQRDTO getMealsRQRDTO, Long userId);
 
     DeleteMealIDTO toDeleteMealIDTO(Long mealId, Long userId);
+
+    DeleteMealsIDTO toDeleteMealsIDTO(DeleteMealsRQRDTO deleteMealsRQRDTO, Long userId);
 }

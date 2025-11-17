@@ -3,11 +3,8 @@ package dev.srello.cocinillas.meal.service.transformer;
 import dev.srello.cocinillas.meal.dto.MealIDTO;
 import dev.srello.cocinillas.meal.dto.MealODTO;
 import dev.srello.cocinillas.meal.model.Meal;
-import dev.srello.cocinillas.recipe.dto.GetRecipeIDTO;
-import dev.srello.cocinillas.recipe.dto.GetRecipesByIdIDTO;
 import dev.srello.cocinillas.recipe.dto.RecipeODTO;
 import lombok.RequiredArgsConstructor;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,11 +14,9 @@ import java.util.List;
 public class MealServiceTransformerImpl implements MealServiceTransformer {
     private final MealServiceMapper mapper;
 
-    @Nullable
-    private static RecipeODTO findRecipe(Meal meal, List<RecipeODTO> distinctRecipes) {
-        return distinctRecipes.stream().filter(recipe -> meal.getRecipeId().equals(recipe.getId()))
-                .findFirst()
-                .orElse(null);
+    private static List<RecipeODTO> findRecipes(Meal meal, List<RecipeODTO> distinctRecipes) {
+        return distinctRecipes.stream().filter(recipe -> meal.getRecipeIds().contains(recipe.getId()))
+                .toList();
     }
 
     @Override
@@ -30,8 +25,13 @@ public class MealServiceTransformerImpl implements MealServiceTransformer {
     }
 
     @Override
-    public MealODTO toMealODTO(Meal meal, RecipeODTO recipe) {
-        return mapper.toMealODTO(meal, recipe);
+    public List<Meal> toMeals(List<MealIDTO> mealsIDTO) {
+        return mealsIDTO.stream().map(this::toMeal).toList();
+    }
+
+    @Override
+    public MealODTO toMealODTO(Meal meal, List<RecipeODTO> recipes) {
+        return mapper.toMealODTO(meal, recipes);
     }
 
     @Override
@@ -42,17 +42,7 @@ public class MealServiceTransformerImpl implements MealServiceTransformer {
     @Override
     public List<MealODTO> toMealsODTO(List<Meal> meals, List<RecipeODTO> recipeODTOS) {
         return meals.stream()
-                .map(meal -> toMealODTO(meal, findRecipe(meal, recipeODTOS)))
+                .map(meal -> toMealODTO(meal, findRecipes(meal, recipeODTOS)))
                 .toList();
-    }
-
-    @Override
-    public GetRecipeIDTO toGetRecipeIDTO(MealIDTO mealIDTO) {
-        return mapper.toGetRecipeIDTO(mealIDTO);
-    }
-
-    @Override
-    public GetRecipesByIdIDTO toGetRecipesByIdIDTO(List<Long> recipeIds, Long userId) {
-        return mapper.toGetRecipesByIdIDTO(recipeIds, userId);
     }
 }

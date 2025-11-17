@@ -39,11 +39,12 @@ public class Codes {
 
         //MEALS
         public static final String MEAL_NOT_FOUND_CODE = "029";
+        public static final String MEALS_CAN_NOT_BE_EMPTY_CODE = "030";
 
         //TAGS
-        public static final String TAG_NOT_FOUND_CODE = "030";
+        public static final String TAG_NOT_FOUND_CODE = "031";
 
         //MENUS
-        public static final String MENU_NOT_FOUND_CODE = "031";
+        public static final String MENU_NOT_FOUND_CODE = "032";
     }
 }

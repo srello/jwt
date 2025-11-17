@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
@@ -12,6 +13,6 @@ public class MealODTO {
     private Long id;
     private String name;
     private Long userId;
-    private RecipeODTO recipe;
+    private List<RecipeODTO> recipes;
     private LocalDateTime dateTime;
 }

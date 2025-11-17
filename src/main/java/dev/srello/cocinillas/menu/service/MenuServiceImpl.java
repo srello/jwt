@@ -10,6 +10,8 @@ import dev.srello.cocinillas.menu.repository.MenuInteractionRepository;
 import dev.srello.cocinillas.menu.repository.MenuRepository;
 import dev.srello.cocinillas.menu.service.transformer.MenuServiceTransformer;
 import dev.srello.cocinillas.menu.specification.MenuSpecificationService;
+import dev.srello.cocinillas.recipe.adapter.RecipeServiceAdapter;
+import dev.srello.cocinillas.recipe.dto.RecipeODTO;
 import dev.srello.cocinillas.shared.pagination.dto.PaginationIDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -36,13 +38,17 @@ public class MenuServiceImpl implements MenuService {
     private final MenuServiceTransformer transformer;
     private final MenuSpecificationService specificationService;
     private final MenuInteractionRepository menuInteractionRepository;
+    private final RecipeServiceAdapter recipeServiceAdapter;
 
     @Override
     public MenuODTO createMenu(MenuIDTO menuIDTO) {
         Menu menu = transformer.toMenu(menuIDTO);
         try {
             Menu savedMenu = repository.save(menu);
-            return transformer.toMenuODTO(savedMenu, getMenuInteractionsList(of(savedMenu), menuIDTO.getAuthor().getId()));
+            Long authorId = menuIDTO.getAuthor().getId();
+            List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMenus(of(menu), authorId);
+            List<MenuInteraction> interactions = getMenuInteractionsList(of(savedMenu), authorId);
+            return transformer.toMenuODTO(savedMenu, interactions, recipes);
         } catch (DataIntegrityViolationException e) {
             throw new RequestException(NOT_FOUND, TAG_NOT_FOUND, TAG_NOT_FOUND_CODE);
         }
@@ -52,23 +58,28 @@ public class MenuServiceImpl implements MenuService {
     public MenuODTO deleteMenu(Long id) {
         Menu menu = repository.findById(id).orElseThrow(() -> new RequestException(NOT_FOUND, MENU_NOT_FOUND, MENU_NOT_FOUND_CODE));
         repository.delete(menu);
-        return transformer.toMenuODTO(menu, emptyList());
+        return transformer.toMenuODTO(menu, emptyList(), emptyList());
     }
 
     @Override
     public Page<MenuODTO> getMenusPaginated(GetMenusIDTO getMenusIDTO, PaginationIDTO paginationIDTO) {
+        Long userId = getMenusIDTO.getUserId();
         Specification<Menu> menuSpecification = specificationService.buildMenusPaginatedSpecification(getMenusIDTO);
         Page<Menu> menus = repository.findAll(menuSpecification, paginationIDTO.getPageRequest());
-        List<MenuInteraction> menuInteractions = getMenuInteractionsList(menus.toList(), getMenusIDTO.getUserId());
-        return transformer.toMenusODTO(menus, menuInteractions);
+        List<MenuInteraction> menuInteractions = getMenuInteractionsList(menus.toList(), userId);
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMenus(menus.toList(), userId);
+
+        return transformer.toMenusODTO(menus, menuInteractions, recipes);
     }
 
     @Override
-    public Page<MenuODTO> getUserMenusPaginated(Long userId, PaginationIDTO paginationIDTO) {
-        Specification<Menu> menuSpecification = specificationService.buildUserMenusPaginatedSpecification(userId);
-        Page<Menu> menus = repository.findAll(menuSpecification, paginationIDTO.getPageRequest());
+    public Page<MenuODTO> getUserMenusPaginated(GetMenusIDTO getMenusIDTO, PaginationIDTO paginationIDTO) {
+        Long userId = getMenusIDTO.getUserId();
+        Specification<Menu> userSpecification = specificationService.buildUserMenusPaginatedSpecification(getMenusIDTO);
+        Page<Menu> menus = repository.findAll(userSpecification, paginationIDTO.getPageRequest());
         List<MenuInteraction> menuInteractions = getMenuInteractionsList(menus.toList(), userId);
-        return transformer.toMenusODTO(menus, menuInteractions);
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMenus(menus.toList(), userId);
+        return transformer.toMenusODTO(menus, menuInteractions, recipes);
     }
 
     private List<MenuInteraction> getMenuInteractionsList(List<Menu> menus, Long userId) {

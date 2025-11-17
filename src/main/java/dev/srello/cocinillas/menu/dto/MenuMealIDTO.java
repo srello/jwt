@@ -4,12 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Getter
 @AllArgsConstructor
 public class MenuMealIDTO {
     private String name;
-    private Long recipeId;
+    private List<Long> recipeIds;
     private LocalTime hour;
     private Integer dayIndex;
 }

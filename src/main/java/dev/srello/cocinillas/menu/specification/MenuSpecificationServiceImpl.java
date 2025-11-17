@@ -41,7 +41,16 @@ public class MenuSpecificationServiceImpl implements MenuSpecificationService {
     }
 
     @Override
-    public Specification<Menu> buildUserMenusPaginatedSpecification(Long userId) {
+    public Specification<Menu> buildUserMenusPaginatedSpecification(GetMenusIDTO getMenusIDTO) {
+        Specification<Menu> nameSpecification = ofNullable(getMenusIDTO.getName()).map(this::nameContains).orElse(null);
+        Specification<Menu> userSpecification = userMenus(getMenusIDTO.getUserId());
+        return Stream.of(nameSpecification, userSpecification)
+                .filter(Objects::nonNull)
+                .reduce(Specification::and)
+                .orElse(userSpecification);
+    }
+
+    private Specification<Menu> userMenus(Long userId) {
         return (menuTable, query, cb) -> {
             Predicate isAuthor = cb.equal(menuTable.get("author").get("id"), userId);
             Subquery<Long> subquery = query.subquery(Long.class);

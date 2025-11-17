@@ -39,6 +39,7 @@ public class Messages {
 
         //MEALS
         public static final String MEAL_NOT_FOUND = "Meal not found.";
+        public static final String MEALS_CAN_NOT_BE_EMPTY = "Meals can not be empty.";
 
         //TAGS
         public static final String TAG_NOT_FOUND = "Tag not found.";

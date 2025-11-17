@@ -13,5 +13,5 @@ public interface MenuService {
 
     Page<MenuODTO> getMenusPaginated(GetMenusIDTO getMenusIDTO, PaginationIDTO paginationIDTO);
 
-    Page<MenuODTO> getUserMenusPaginated(Long id, PaginationIDTO paginationIDTO);
+    Page<MenuODTO> getUserMenusPaginated(GetMenusIDTO id, PaginationIDTO paginationIDTO);
 }

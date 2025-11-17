@@ -21,6 +21,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.ME_PATH_VARIABLE;
 import static org.springframework.http.ResponseEntity.ok;
 
 
@@ -57,10 +58,11 @@ public class MenuController {
         return ok().body(menusRSRDTO);
     }
 
-    @GetMapping("/private")
-    public ResponseEntity<Page<MenuRSRDTO>> getUserMenusPaginated(@Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
+    @GetMapping(ME_PATH_VARIABLE)
+    public ResponseEntity<Page<MenuRSRDTO>> getUserMenusPaginated(@Valid GetMenusRQRDTO getMenusRQRDTO, @Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
+        GetMenusIDTO getMenusIDTO = transformer.toGetMenusIDTO(getMenusRQRDTO, currentUser.getId());
         PaginationIDTO paginationIDTO = paginationTransformer.toPaginationIDTO(paginationRQRDTO);
-        Page<MenuODTO> menusODTO = service.getUserMenusPaginated(currentUser.getId(), paginationIDTO);
+        Page<MenuODTO> menusODTO = service.getUserMenusPaginated(getMenusIDTO, paginationIDTO);
         Page<MenuRSRDTO> menusRSRDTO = transformer.toMenusRSRDTO(menusODTO);
         return ok().body(menusRSRDTO);
     }

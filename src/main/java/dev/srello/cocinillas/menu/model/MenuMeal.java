@@ -7,7 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalTime;
+import java.util.List;
 
+import static jakarta.persistence.FetchType.EAGER;
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @Entity
@@ -25,8 +27,13 @@ public class MenuMeal {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Long recipeId;
+    @ElementCollection(fetch = EAGER)
+    @CollectionTable(
+            name = "menu_meal_recipes",
+            joinColumns = @JoinColumn(name = "menu_meal_id")
+    )
+    @Column(name = "recipe_id")
+    private List<Long> recipeIds;
 
     @Column(nullable = false)
     private LocalTime hour;
