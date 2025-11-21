@@ -25,4 +25,5 @@ public class RecipeODTO {
     private Long likes;
     private Boolean isLiked;
     private Boolean isSaved;
+    private RecipeAuthorODTO author;
 }

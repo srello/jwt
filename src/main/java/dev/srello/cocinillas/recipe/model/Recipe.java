@@ -38,7 +38,7 @@ public class Recipe {
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     private List<Instruction> instructions;
 
-    @ManyToMany(fetch = EAGER, cascade = ALL)
+    @ManyToMany(fetch = EAGER)
     private List<Ingredient> ingredients;
 
     @Column

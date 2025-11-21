@@ -9,7 +9,7 @@ import java.util.List;
 public interface RecipeService {
     Page<RecipeODTO> getRecipesPaginated(GetRecipesIDTO getRecipesIDTO, PaginationIDTO pagination);
 
-    Page<RecipeODTO> getUserRecipesPaginated(Long id, PaginationIDTO paginationIDTO);
+    Page<RecipeODTO> getUserRecipesPaginated(GetRecipesIDTO id, PaginationIDTO paginationIDTO);
 
     RecipeODTO getRecipeById(GetRecipeIDTO getRecipeIDTO);
 
@@ -18,4 +18,8 @@ public interface RecipeService {
     RecipeInteractionODTO createRecipeInteraction(RecipeInteractionIDTO saveRecipeIDTO);
 
     RecipeInteractionODTO deleteRecipeInteraction(RecipeInteractionIDTO recipeInteractionIDTO);
+
+    RecipeODTO deleteRecipeById(DeleteRecipeIDTO deleteRecipeIDTO);
+
+    RecipeODTO createRecipe(RecipeIDTO recipeIDTO);
 }

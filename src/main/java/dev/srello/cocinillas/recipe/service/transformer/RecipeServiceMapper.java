@@ -2,10 +2,7 @@ package dev.srello.cocinillas.recipe.service.transformer;
 
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.service.transformer.ProductServiceMapper;
-import dev.srello.cocinillas.recipe.dto.MacrosODTO;
-import dev.srello.cocinillas.recipe.dto.RecipeInteractionIDTO;
-import dev.srello.cocinillas.recipe.dto.RecipeInteractionODTO;
-import dev.srello.cocinillas.recipe.dto.RecipeODTO;
+import dev.srello.cocinillas.recipe.dto.*;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.model.RecipeInteraction;
@@ -39,11 +36,20 @@ public interface RecipeServiceMapper {
     }
 
     @Mapping(target = "macros", source = "recipe.ingredients", qualifiedByName = "getMacrosFromIngredients")
-    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls, Boolean isLiked, Boolean isSaved);
+    @Mapping(target = "author", source = "author")
+    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls, Boolean isLiked, Boolean isSaved, RecipeAuthorODTO author);
+
+    RecipeAuthorODTO toRecipeAuthorODTO(String username, Boolean isUserAuthor);
 
     RecipeInteraction toRecipeInteraction(RecipeInteractionIDTO recipeInteractionIDTO);
 
     RecipeInteractionODTO toRecipeInteractionODTO(RecipeInteraction recipeInteraction);
+
+    @Mapping(target = "imageKeys", source = "images", qualifiedByName = "imagesToImageKeys")
+    Recipe toRecipe(RecipeIDTO recipeIDTO);
+
+    @Mapping(target = "product", source = "productId", qualifiedByName = "productIdToProduct")
+    Ingredient toIngredient(IngredientIDTO ingredientIDTO);
 
     @Named("getMacrosFromIngredients")
     default MacrosODTO getMacrosFromIngredients(List<Ingredient> ingredients) {
@@ -60,4 +66,17 @@ public interface RecipeServiceMapper {
                 .collect(Collector.of(MacrosODTO::new, RecipeServiceMapper::mergeMacros, RecipeServiceMapper::mergeMacros)
                 );
     }
+
+    @Named("productIdToProduct")
+    default Product productIdToProduct(Long productId) {
+        return Product.builder()
+                .id(productId)
+                .build();
+    }
+
+    @Named("imagesToImageKeys")
+    default List<String> imagesToImageKeys(List<RecipeImageIDTO> images) {
+        return images.stream().map(RecipeImageIDTO::getKey).toList();
+    }
 }
+

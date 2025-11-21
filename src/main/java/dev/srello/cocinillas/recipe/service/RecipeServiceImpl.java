@@ -8,16 +8,21 @@ import dev.srello.cocinillas.recipe.repository.RecipeInteractionRepository;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
 import dev.srello.cocinillas.recipe.service.transformer.RecipeServiceTransformer;
 import dev.srello.cocinillas.shared.pagination.dto.PaginationIDTO;
+import dev.srello.cocinillas.storage.service.StorageService;
+import dev.srello.cocinillas.user.dto.UserODTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.net.URL;
 import java.util.List;
 
 import static dev.srello.cocinillas.core.codes.messages.Codes.Error.*;
 import static dev.srello.cocinillas.core.messages.Messages.Error.*;
+import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.LIKE;
+import static dev.srello.cocinillas.user.enums.Role.ADMIN;
 import static java.util.Collections.emptyList;
 import static java.util.List.of;
 import static java.util.Objects.isNull;
@@ -32,37 +37,44 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeSpecificationService specification;
     private final RecipeRepository repository;
     private final RecipeInteractionRepository recipeInteractionRepository;
+    private final StorageService storageService;
 
     @Override
     public Page<RecipeODTO> getRecipesPaginated(GetRecipesIDTO getRecipesIDTO, PaginationIDTO pagination) {
         Specification<Recipe> recipeSpecification = specification.buildRecipesPaginatedSpecification(getRecipesIDTO);
         Page<Recipe> recipes = repository.findAll(recipeSpecification, pagination.getPageRequest());
 
-        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes.stream().toList(), getRecipesIDTO.getUserId());
+        Long userId = getRecipesIDTO.getUserId();
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes.stream().toList(), userId);
 
-        return transformer.toRecipesODTO(recipes, recipeInteractions);
+        return recipes.map(recipe -> transformer.toRecipeODTO(recipe, recipeInteractions, getImageUrls(recipe.getImageKeys()), userId));
     }
 
     @Override
-    public Page<RecipeODTO> getUserRecipesPaginated(Long userId, PaginationIDTO paginationIDTO) {
-        Specification<Recipe> recipeSpecification = specification.buildUserRecipesPaginatedSpecification(userId);
+    public Page<RecipeODTO> getUserRecipesPaginated(GetRecipesIDTO getRecipesIDTO, PaginationIDTO paginationIDTO) {
+        Specification<Recipe> recipeSpecification = specification.buildUserRecipesPaginatedSpecification(getRecipesIDTO);
         Page<Recipe> recipes = repository.findAll(recipeSpecification, paginationIDTO.getPageRequest());
+        Long userId = getRecipesIDTO.getUserId();
         List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes.stream().toList(), userId);
-        return transformer.toRecipesODTO(recipes, recipeInteractions);
+        return recipes.map(recipe -> transformer.toRecipeODTO(recipe, recipeInteractions, getImageUrls(recipe.getImageKeys()), userId));
     }
 
     @Override
     public RecipeODTO getRecipeById(GetRecipeIDTO getRecipeIDTO) {
         Recipe recipe = findRecipeById(getRecipeIDTO.getId());
-        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(of(recipe), getRecipeIDTO.getUserId());
-        return transformer.toRecipeODTO(recipe, recipeInteractions);
+        Long userId = getRecipeIDTO.getUserId();
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(of(recipe), userId);
+        return transformer.toRecipeODTO(recipe, recipeInteractions, getImageUrls(recipe.getImageKeys()), userId);
     }
 
     @Override
     public List<RecipeODTO> getRecipesById(GetRecipesByIdIDTO getRecipesByIdIDTO) {
         List<Recipe> recipes = repository.findAllById(getRecipesByIdIDTO.getRecipeIds());
-        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes, getRecipesByIdIDTO.getUserId());
-        return transformer.toRecipesODTO(recipes, recipeInteractions);
+        Long userId = getRecipesByIdIDTO.getUserId();
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes, userId);
+        return recipes.stream()
+                .map(recipe -> transformer.toRecipeODTO(recipe, recipeInteractions, getImageUrls(recipe.getImageKeys()), userId))
+                .toList();
     }
 
     @Override
@@ -74,19 +86,46 @@ public class RecipeServiceImpl implements RecipeService {
                     throw new RequestException(BAD_REQUEST, RECIPE_INTERACTION_ALREADY_EXISTS, RECIPE_INTERACTION_ALREADY_EXISTS_CODE);
                 });
         RecipeInteraction savedRecipeInteraction = recipeInteractionRepository.saveAndFlush(recipeInteraction);
-        changeRecipeLikes(recipeId, 1);
+        if (LIKE.equals(savedRecipeInteraction.getType()))
+            changeRecipeLikes(recipeId, 1);
         return transformer.toRecipeInteractionODTO(savedRecipeInteraction);
     }
 
     @Override
     public RecipeInteractionODTO deleteRecipeInteraction(RecipeInteractionIDTO recipeInteractionIDTO) {
-        Long recipeId = recipeInteractionIDTO.getRecipeId();
-        RecipeInteraction recipeInteraction = recipeInteractionRepository.findByUserIdAndRecipeIdAndType(recipeInteractionIDTO.getUserId(), recipeId, recipeInteractionIDTO.getType())
+        RecipeInteraction recipeInteraction = recipeInteractionRepository
+                .findByUserIdAndRecipeIdAndType(recipeInteractionIDTO.getUserId(), recipeInteractionIDTO.getRecipeId(), recipeInteractionIDTO.getType())
                 .orElseThrow(() -> new RequestException(NOT_FOUND, RECIPE_INTERACTION_NOT_FOUND, RECIPE_INTERACTION_NOT_FOUND_CODE));
 
         recipeInteractionRepository.delete(recipeInteraction);
-        changeRecipeLikes(recipeId, -1);
+        if (LIKE.equals(recipeInteraction.getType()))
+            changeRecipeLikes(recipeInteraction.getRecipeId(), -1);
+
         return transformer.toRecipeInteractionODTO(recipeInteraction);
+    }
+
+    @Override
+    public RecipeODTO deleteRecipeById(DeleteRecipeIDTO deleteRecipeIDTO) {
+        Recipe recipe = findRecipeById(deleteRecipeIDTO.getRecipeId());
+        UserODTO user = deleteRecipeIDTO.getUser();
+        if (!ADMIN.equals(user.getRole()) && !recipe.getAuthor().getId().equals(user.getId()))
+            throw new RequestException(BAD_REQUEST, RESOURCE_DELETION_NOT_ALLOWED, RESOURCE_DELETION_NOT_ALLOWED_CODE);
+
+        List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(of(recipe), user.getId());
+        recipeInteractionRepository.deleteAll(recipeInteractions);
+        repository.delete(recipe);
+
+        return transformer.toRecipeODTO(recipe, recipeInteractions, emptyList(), user.getId());
+    }
+
+    @Override
+    public RecipeODTO createRecipe(RecipeIDTO recipeIDTO) {
+        Recipe recipe = transformer.toRecipe(recipeIDTO);
+        Recipe savedRecipe = repository.saveAndFlush(recipe);
+        List<URL> imageUrls = recipeIDTO.getImages().stream()
+                .map(image -> storageService.getPresignedPutURL(image.getKey(), image.getContentType()))
+                .toList();
+        return transformer.toRecipeODTO(savedRecipe, emptyList(), imageUrls, savedRecipe.getAuthor().getId());
     }
 
     private Recipe findRecipeById(Long id) {
@@ -106,4 +145,11 @@ public class RecipeServiceImpl implements RecipeService {
         List<Long> recipeIds = recipes.stream().map(Recipe::getId).toList();
         return recipeInteractionRepository.findAllByUserIdAndRecipeIdIn(userId, recipeIds);
     }
+
+    private List<URL> getImageUrls(List<String> imageKeys) {
+        return imageKeys.stream()
+                .map(storageService::getPresignedGetURL)
+                .toList();
+    }
 }
+

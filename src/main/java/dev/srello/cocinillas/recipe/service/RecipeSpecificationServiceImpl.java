@@ -44,7 +44,19 @@ public class RecipeSpecificationServiceImpl implements RecipeSpecificationServic
     }
 
     @Override
-    public Specification<Recipe> buildUserRecipesPaginatedSpecification(Long userId) {
+    public Specification<Recipe> buildUserRecipesPaginatedSpecification(GetRecipesIDTO getRecipesIDTO) {
+        Specification<Recipe> nameSpecification = ofNullable(getRecipesIDTO.getName()).map(this::nameContains).orElse(null);
+        Specification<Recipe> productsSpecification = ofNullable(getRecipesIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
+        Specification<Recipe> tagsSpecification = ofNullable(getRecipesIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
+        Specification<Recipe> userRecipeSpecification = isUserRecipe(getRecipesIDTO.getUserId());
+
+        return Stream.of(nameSpecification, productsSpecification, tagsSpecification, userRecipeSpecification)
+                .filter(Objects::nonNull)
+                .reduce(Specification::and)
+                .orElse(userRecipeSpecification);
+    }
+
+    private Specification<Recipe> isUserRecipe(Long userId) {
         return (recipeTable, query, cb) -> {
             Predicate isAuthor = cb.equal(recipeTable.get("author").get("id"), userId);
             Subquery<Long> subquery = query.subquery(Long.class);

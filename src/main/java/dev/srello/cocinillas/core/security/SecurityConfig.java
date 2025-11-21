@@ -31,6 +31,7 @@ import java.util.List;
 
 import static dev.srello.cocinillas.auth.controller.AuthController.*;
 import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.PUBLIC_ENDPOINT;
 import static dev.srello.cocinillas.recipe.controller.RecipeController.RECIPE_ROUTE;
 import static java.util.List.of;
 
@@ -48,8 +49,8 @@ public class SecurityConfig {
             AUTH_ROUTE + RESEND_ENDPOINT,
             AUTH_ROUTE + RESET_ENDPOINT,
             AUTH_ROUTE + FORGOT_ENDPOINT,
-            RECIPE_ROUTE,
-            RECIPE_ROUTE + ID_PATH_VARIABLE,
+            RECIPE_ROUTE + PUBLIC_ENDPOINT,
+            RECIPE_ROUTE + PUBLIC_ENDPOINT + ID_PATH_VARIABLE,
             "/terms.html"};
     public static final List<String> PERMITTED_ENDPOINTS_LIST = of(PERMITTED_ENDPOINTS);
     private final AuthTokenFilter authTokenFilter;

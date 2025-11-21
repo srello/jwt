@@ -12,4 +12,5 @@ public class RequestConstants {
     public static final String ID_PATH_VARIABLE = "/{id:[0-9]+}";
     public static final String MULTIPLE_PATH_VARIABLE = "/multiple";
     public static final String ME_PATH_VARIABLE = "/me";
+    public static final String PUBLIC_ENDPOINT = "/public";
 }

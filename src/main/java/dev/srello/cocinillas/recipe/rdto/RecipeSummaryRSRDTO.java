@@ -11,7 +11,8 @@ public record RecipeSummaryRSRDTO(
         MacrosRSRDTO macros,
         Long likes,
         Boolean isLiked,
-        Boolean isSaved
+        Boolean isSaved,
+        RecipeAuthorRSRDTO author
 
 ) {
 }
