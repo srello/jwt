@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.recipe.dto;
 
-import dev.srello.cocinillas.recipe.enums.RecipeInteractionType;
+import dev.srello.cocinillas.shared.enums.InteractionType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,5 +9,5 @@ import lombok.Getter;
 public class RecipeInteractionIDTO {
     private Long userId;
     private Long recipeId;
-    private RecipeInteractionType type;
+    private InteractionType type;
 }

@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.recipe.dto;
 
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.user.dto.UserODTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,11 +12,11 @@ import java.util.List;
 public class RecipeIDTO {
     private String name;
     private String description;
-    private List<IngredientIDTO> ingredientIds;
+    private List<IngredientIDTO> ingredients;
     private List<InstructionIDTO> instructions;
-    private RecipeVisibility visibility;
+    private Visibility visibility;
     private List<Long> tagIds;
     private List<RecipeImageIDTO> images;
-    private Integer totalDuration;
+    private Long totalDuration;
     private UserODTO author;
 }

@@ -9,6 +9,8 @@ import java.util.List;
 public record MenuRQRDTO(
         @NotEmpty(message = "Name is required.")
         String name,
+        @NotEmpty(message = "Description is required.")
+        String description,
         @NotNull("Menu days are required.")
         List<MenuMealRQRDTO> menuMeals,
         List<TagRSRDTO> tags

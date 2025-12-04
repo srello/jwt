@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.menu.dto;
 
-import dev.srello.cocinillas.menu.enums.MenuVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,5 +12,5 @@ public class GetMenusIDTO {
     private String name;
     private List<String> tags;
     private Long userId;
-    private MenuVisibility visibility;
+    private Visibility visibility;
 }

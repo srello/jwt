@@ -2,14 +2,17 @@ package dev.srello.cocinillas.core.initialization;
 
 
 import com.github.javafaker.Faker;
+import dev.srello.cocinillas.menu.model.Menu;
+import dev.srello.cocinillas.menu.model.MenuMeal;
+import dev.srello.cocinillas.menu.repository.MenuRepository;
 import dev.srello.cocinillas.product.enums.ProductCategory;
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.reposiroty.ProductRepository;
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Instruction;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.tags.repository.TagRepository;
 import dev.srello.cocinillas.unit.enums.Unit;
@@ -25,9 +28,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static dev.srello.cocinillas.shared.enums.Visibility.OFFICIAL;
 import static dev.srello.cocinillas.tags.enums.TagType.values;
 import static dev.srello.cocinillas.user.enums.Role.ADMIN;
 import static dev.srello.cocinillas.user.enums.Role.USER;
@@ -44,8 +50,17 @@ public class InitializationData {
     private final ProductRepository productRepository;
     private final RecipeRepository recipeRepository;
     private final TagRepository tagRepository;
+    private final MenuRepository menuRepository;
     private final PasswordEncoder passwordEncoder;
     private final String[] devImageKeys = {"carbonara.png", "ensalada cesar.png", "paella.png", "reina pepiada.png", "verduras thai.jpg"};
+    private final Map<String, LocalTime> mealNamesHours = Map.of(
+            "Desayuno", LocalTime.of(9, 0),
+            "Almuerzo", LocalTime.of(11, 0),
+            "Comida", LocalTime.of(14, 0),
+            "Merienda", LocalTime.of(17, 0),
+            "Cena", LocalTime.of(21, 0)
+    );
+    private final Faker faker = new Faker();
     @Value("${LOAD_INITIAL_DATA:false}")
     private boolean loadInitialData;
 
@@ -58,17 +73,53 @@ public class InitializationData {
     private void createDbData() {
         if (!loadInitialData) return;
 
-        Faker faker = new Faker();
 
         List<User> users = userRepository.saveAllAndFlush(generateUsers());
 
-        tagRepository.saveAllAndFlush(generateRandomTags(faker));
+        tagRepository.saveAllAndFlush(generateRandomTags());
 
-        List<Product> ingredients = productRepository.saveAllAndFlush(generateRandomIngredients(faker));
+        List<Product> productsWithoutConversions = productRepository.saveAllAndFlush(generateRandomProducts(users));
 
-        recipeRepository.saveAllAndFlush(generateRandomRecipes(faker, ingredients, users));
+        List<Product> products = productRepository.saveAllAndFlush(generateUnitConversions(productsWithoutConversions));
 
+        List<Recipe> recipes = generateRandomRecipes(products, users);
+        recipeRepository.saveAllAndFlush(recipes);
 
+        menuRepository.saveAllAndFlush(generateMenus(users, recipes));
+    }
+
+    private Iterable<Menu> generateMenus(List<User> users, List<Recipe> recipes) {
+        List<Menu> menus = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+
+            User author = users.get(current().nextInt(users.size()));
+            Visibility[] visibilities = Visibility.values();
+            Menu menu = Menu.builder()
+                    .author(author)
+                    .menuMeals(generateRandomMeals(recipes))
+                    .visibility(visibilities[current().nextInt(visibilities.length)])
+                    .likes(0L)
+                    .name(faker.funnyName().name())
+                    .description(faker.howIMetYourMother().quote())
+                    .build();
+            menus.add(menu);
+        }
+        return menus;
+    }
+
+    private List<MenuMeal> generateRandomMeals(List<Recipe> recipes) {
+        List<MenuMeal> menuMeals = new ArrayList<>();
+        for (int i = 0; i < current().nextInt(7, 15); i++) {
+            String name = mealNamesHours.keySet().stream().toList().get(current().nextInt(0, mealNamesHours.size()));
+            MenuMeal menuMeal = MenuMeal.builder()
+                    .name(name)
+                    .recipeIds(of(recipes.get(current().nextInt(0, recipes.size())).getId()))
+                    .hour(mealNamesHours.get(name))
+                    .dayIndex(current().nextInt(1, 7))
+                    .build();
+            menuMeals.add(menuMeal);
+        }
+        return menuMeals;
     }
 
     private List<User> generateUsers() {
@@ -92,7 +143,7 @@ public class InitializationData {
         return of(admin, user);
     }
 
-    private List<Tag> generateRandomTags(Faker faker) {
+    private List<Tag> generateRandomTags() {
         List<Tag> tags = new ArrayList<>();
 
         for (int i = 0; i < 50; i++) {
@@ -104,16 +155,28 @@ public class InitializationData {
         return tags;
     }
 
-    private List<Product> generateRandomIngredients(Faker faker) {
-        List<Product> ingredients = new ArrayList<>();
-        ProductCategory[] productCategories = ProductCategory.values();
+    private List<Product> generateUnitConversions(List<Product> products) {
         Unit[] units = Unit.values();
-        for (int i = 0; i < 100; i++) {
+        List<Product> list = new ArrayList<>();
+        for (Product product : products) {
             UnitConversion unitConversion = UnitConversion.builder()
                     .conversionFactor(current().nextDouble(1, 50))
                     .targetUnit(units[current().nextInt(units.length)])
+                    .product(product)
                     .build();
-            ingredients.add(Product.builder()
+            product.setUnitConversions(of(unitConversion));
+            list.add(product);
+        }
+        return list;
+    }
+
+    private List<Product> generateRandomProducts(List<User> users) {
+        List<Product> products = new ArrayList<>();
+        ProductCategory[] productCategories = ProductCategory.values();
+        Unit[] units = Unit.values();
+        for (int i = 0; i < 100; i++) {
+
+            products.add(Product.builder()
                     .name(faker.food().ingredient())
                     .productCategory(productCategories[current().nextInt(productCategories.length)])
                     .baseUnit(units[current().nextInt(units.length)])
@@ -121,15 +184,16 @@ public class InitializationData {
                     .calories(current().nextDouble(1, 150))
                     .carbohydrates(current().nextDouble(1, 100))
                     .protein(current().nextDouble(1, 100))
-                    .unitConversions(of(unitConversion))
+                    .visibility(OFFICIAL)
+                    .author(users.get(current().nextInt(users.size())))
                     .build());
         }
-        return ingredients;
+        return products;
     }
 
-    private List<Recipe> generateRandomRecipes(Faker faker, List<Product> products, List<User> users) {
+    private List<Recipe> generateRandomRecipes(List<Product> products, List<User> users) {
         List<Recipe> recipes = new ArrayList<>();
-        RecipeVisibility[] recipeVisibilities = RecipeVisibility.values();
+        Visibility[] visibilities = Visibility.values();
         for (int i = 0; i < 200; i++) {
             shuffle(products);
             String name = faker.food().dish();
@@ -143,11 +207,11 @@ public class InitializationData {
             recipes.add(Recipe.builder()
                     .name(name)
                     .description(faker.backToTheFuture().quote())
-                    .visibility(recipeVisibilities[current().nextInt(recipeVisibilities.length)])
+                    .visibility(visibilities[current().nextInt(visibilities.length)])
                     .ingredients(ingredients)
                     .instructions(generateRandomInstructions(faker))
                     .imageKeys(of(devImageKeys[current().nextInt(devImageKeys.length)]))
-                    .totalDuration(current().nextInt(5, 240))
+                    .totalDuration(current().nextLong(5, 240))
                     .creationDate(now.minusDays(current().nextLong(60)))
                     .likes(current().nextLong(1000))
                     .author(users.get(current().nextInt(users.size())))

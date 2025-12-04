@@ -2,9 +2,11 @@ package dev.srello.cocinillas.product.dto;
 
 import dev.srello.cocinillas.allergen.dto.AllergenODTO;
 import dev.srello.cocinillas.product.enums.ProductCategory;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.dto.TagODTO;
 import dev.srello.cocinillas.unit.dto.UnitConversionODTO;
 import dev.srello.cocinillas.unit.enums.Unit;
+import dev.srello.cocinillas.user.dto.AuthorODTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -24,4 +26,6 @@ public class ProductODTO {
     private Double fat;
     private List<AllergenODTO> allergens;
     private List<TagODTO> tags;
+    private Visibility visibility;
+    private AuthorODTO author;
 }

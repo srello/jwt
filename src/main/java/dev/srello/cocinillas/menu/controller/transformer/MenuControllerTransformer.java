@@ -1,11 +1,7 @@
 package dev.srello.cocinillas.menu.controller.transformer;
 
-import dev.srello.cocinillas.menu.dto.GetMenusIDTO;
-import dev.srello.cocinillas.menu.dto.MenuIDTO;
-import dev.srello.cocinillas.menu.dto.MenuODTO;
-import dev.srello.cocinillas.menu.rdto.GetMenusRQRDTO;
-import dev.srello.cocinillas.menu.rdto.MenuRQRDTO;
-import dev.srello.cocinillas.menu.rdto.MenuRSRDTO;
+import dev.srello.cocinillas.menu.dto.*;
+import dev.srello.cocinillas.menu.rdto.*;
 import dev.srello.cocinillas.user.dto.UserODTO;
 import lombok.NonNull;
 import org.springframework.data.domain.Page;
@@ -16,7 +12,17 @@ public interface MenuControllerTransformer {
 
     MenuRSRDTO toMenuRSRDTO(@NonNull MenuODTO menuODTO);
 
-    GetMenusIDTO toGetMenusIDTO(GetMenusRQRDTO getMenusRQRDTO, Long userId);
+    GetMenusIDTO toGetMenusIDTO(@NonNull GetMenusRQRDTO getMenusRQRDTO, Long userId);
 
-    Page<MenuRSRDTO> toMenusRSRDTO(Page<MenuODTO> menusODTO);
+    Page<MenuRSRDTO> toMenusRSRDTO(@NonNull Page<MenuODTO> menusODTO);
+
+    Page<MenuSummaryRSRDTO> toMenuSummaryRSRDTO(@NonNull Page<MenuODTO> menusODTO);
+
+    MenuInteractionIDTO toMenuInteractionIDTO(@NonNull MenuInteractionRQRDTO menuInteractionRQRDTO, @NonNull Long userId);
+
+    MenuInteractionRSRDTO toMenuInteractionRSRDTO(@NonNull MenuInteractionODTO menuInteractionODTO);
+
+    GetMenuIDTO toGetMenuIDTO(@NonNull Long menuId, @NonNull Long userId);
+
+    DeleteMenuIDTO toDeleteMenuIDTO(@NonNull Long menuId, @NonNull Long userId);
 }

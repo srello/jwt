@@ -1,12 +1,8 @@
 package dev.srello.cocinillas.menu.controller;
 
 import dev.srello.cocinillas.menu.controller.transformer.MenuControllerTransformer;
-import dev.srello.cocinillas.menu.dto.GetMenusIDTO;
-import dev.srello.cocinillas.menu.dto.MenuIDTO;
-import dev.srello.cocinillas.menu.dto.MenuODTO;
-import dev.srello.cocinillas.menu.rdto.GetMenusRQRDTO;
-import dev.srello.cocinillas.menu.rdto.MenuRQRDTO;
-import dev.srello.cocinillas.menu.rdto.MenuRSRDTO;
+import dev.srello.cocinillas.menu.dto.*;
+import dev.srello.cocinillas.menu.rdto.*;
 import dev.srello.cocinillas.menu.service.MenuService;
 import dev.srello.cocinillas.shared.pagination.dto.PaginationIDTO;
 import dev.srello.cocinillas.shared.pagination.rdto.PaginationRQRDTO;
@@ -20,16 +16,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
-import static dev.srello.cocinillas.core.request.RequestConstants.ME_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.*;
 import static org.springframework.http.ResponseEntity.ok;
 
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/menus")
+@RequestMapping(MenuController.MENUS_ROUTE)
 public class MenuController {
 
+    public static final String MENUS_ROUTE = "/menus";
     private final MenuControllerTransformer transformer;
     private final PaginationTransformer paginationTransformer;
     private final MenuService service;
@@ -43,27 +39,52 @@ public class MenuController {
     }
 
     @DeleteMapping(ID_PATH_VARIABLE)
-    public ResponseEntity<MenuRSRDTO> deleteMenu(@PathVariable Long id) {
-        MenuODTO menuODTO = service.deleteMenu(id);
+    public ResponseEntity<MenuRSRDTO> deleteMenu(@PathVariable Long id, @CurrentUser UserODTO currentUser) {
+        DeleteMenuIDTO deleteMenuIDTO = transformer.toDeleteMenuIDTO(id, currentUser.getId());
+        MenuODTO menuODTO = service.deleteMenu(deleteMenuIDTO);
         MenuRSRDTO menuRSRDTO = transformer.toMenuRSRDTO(menuODTO);
         return ok().body(menuRSRDTO);
     }
 
     @GetMapping
-    public ResponseEntity<Page<MenuRSRDTO>> getMenusPaginated(@Valid GetMenusRQRDTO getMenusRQRDTO, @Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
+    public ResponseEntity<Page<MenuSummaryRSRDTO>> getMenusPaginated(@Valid GetMenusRQRDTO getMenusRQRDTO, @Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
         GetMenusIDTO getMenusIDTO = transformer.toGetMenusIDTO(getMenusRQRDTO, currentUser.getId());
         PaginationIDTO paginationIDTO = paginationTransformer.toPaginationIDTO(paginationRQRDTO);
         Page<MenuODTO> menusODTO = service.getMenusPaginated(getMenusIDTO, paginationIDTO);
-        Page<MenuRSRDTO> menusRSRDTO = transformer.toMenusRSRDTO(menusODTO);
-        return ok().body(menusRSRDTO);
+        Page<MenuSummaryRSRDTO> menuSummaryRSRDTO = transformer.toMenuSummaryRSRDTO(menusODTO);
+        return ok().body(menuSummaryRSRDTO);
     }
 
     @GetMapping(ME_PATH_VARIABLE)
-    public ResponseEntity<Page<MenuRSRDTO>> getUserMenusPaginated(@Valid GetMenusRQRDTO getMenusRQRDTO, @Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
+    public ResponseEntity<Page<MenuSummaryRSRDTO>> getUserMenusPaginated(@Valid GetMenusRQRDTO getMenusRQRDTO, @Valid PaginationRQRDTO paginationRQRDTO, @CurrentUser UserODTO currentUser) {
         GetMenusIDTO getMenusIDTO = transformer.toGetMenusIDTO(getMenusRQRDTO, currentUser.getId());
         PaginationIDTO paginationIDTO = paginationTransformer.toPaginationIDTO(paginationRQRDTO);
         Page<MenuODTO> menusODTO = service.getUserMenusPaginated(getMenusIDTO, paginationIDTO);
-        Page<MenuRSRDTO> menusRSRDTO = transformer.toMenusRSRDTO(menusODTO);
-        return ok().body(menusRSRDTO);
+        Page<MenuSummaryRSRDTO> menuSummaryRSRDTO = transformer.toMenuSummaryRSRDTO(menusODTO);
+        return ok().body(menuSummaryRSRDTO);
+    }
+
+    @GetMapping(ID_PATH_VARIABLE)
+    public ResponseEntity<MenuRSRDTO> getMenuById(@PathVariable Long id, @CurrentUser UserODTO currentUser) {
+        GetMenuIDTO getMenuIDTO = transformer.toGetMenuIDTO(id, currentUser.getId());
+        MenuODTO menuODTO = service.getMenuById(getMenuIDTO);
+        MenuRSRDTO menuRSRDTO = transformer.toMenuRSRDTO(menuODTO);
+        return ok(menuRSRDTO);
+    }
+
+    @PostMapping(INTERACTIONS_PATH)
+    public ResponseEntity<MenuInteractionRSRDTO> createMenuInteraction(@RequestBody MenuInteractionRQRDTO menuInteractionRQRDTO, @CurrentUser UserODTO currentUser) {
+        MenuInteractionIDTO menuInteractionIDTO = transformer.toMenuInteractionIDTO(menuInteractionRQRDTO, currentUser.getId());
+        MenuInteractionODTO menuInteractionODTO = service.createMenuInteraction(menuInteractionIDTO);
+        MenuInteractionRSRDTO menuInteractionRSRDTO = transformer.toMenuInteractionRSRDTO(menuInteractionODTO);
+        return ok(menuInteractionRSRDTO);
+    }
+
+    @DeleteMapping(INTERACTIONS_PATH)
+    public ResponseEntity<MenuInteractionRSRDTO> deleteMenuInteraction(@Valid MenuInteractionRQRDTO menuInteractionRQRDTO, @CurrentUser UserODTO currentUser) {
+        MenuInteractionIDTO menuInteractionIDTO = transformer.toMenuInteractionIDTO(menuInteractionRQRDTO, currentUser.getId());
+        MenuInteractionODTO menuInteractionODTO = service.deleteMenuInteraction(menuInteractionIDTO);
+        MenuInteractionRSRDTO menuInteractionRSRDTO = transformer.toMenuInteractionRSRDTO(menuInteractionODTO);
+        return ok(menuInteractionRSRDTO);
     }
 }

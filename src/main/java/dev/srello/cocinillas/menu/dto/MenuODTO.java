@@ -1,8 +1,8 @@
 package dev.srello.cocinillas.menu.dto;
 
-import dev.srello.cocinillas.menu.enums.MenuVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.dto.TagODTO;
-import dev.srello.cocinillas.user.model.User;
+import dev.srello.cocinillas.user.dto.AuthorODTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -13,11 +13,12 @@ import java.util.List;
 public class MenuODTO {
     private Long id;
     private String name;
+    private String description;
     private List<MenuMealODTO> menuMeals;
-    private User author;
+    private AuthorODTO author;
     private List<TagODTO> tags;
     private Long likes;
-    private MenuVisibility visibility;
+    private Visibility visibility;
     private Boolean isLiked;
     private Boolean isSaved;
 }

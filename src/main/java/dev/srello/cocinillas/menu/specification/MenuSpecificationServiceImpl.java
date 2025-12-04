@@ -1,9 +1,9 @@
 package dev.srello.cocinillas.menu.specification;
 
 import dev.srello.cocinillas.menu.dto.GetMenusIDTO;
-import dev.srello.cocinillas.menu.enums.MenuVisibility;
 import dev.srello.cocinillas.menu.model.Menu;
 import dev.srello.cocinillas.menu.model.MenuInteraction;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import jakarta.persistence.criteria.CriteriaBuilder.In;
 import jakarta.persistence.criteria.Join;
@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static dev.srello.cocinillas.menu.enums.MenuInteractionType.SAVE;
-import static dev.srello.cocinillas.menu.enums.MenuVisibility.*;
+import static dev.srello.cocinillas.shared.enums.InteractionType.SAVE;
+import static dev.srello.cocinillas.shared.enums.Visibility.*;
 import static jakarta.persistence.criteria.JoinType.LEFT;
 import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
@@ -89,7 +89,7 @@ public class MenuSpecificationServiceImpl implements MenuSpecificationService {
         };
     }
 
-    private Specification<Menu> isInVisibilityNotPrivate(MenuVisibility visibility) {
+    private Specification<Menu> isInVisibilityNotPrivate(Visibility visibility) {
 
         return (menuTable, query, criteriaBuilder) ->
         {

@@ -1,19 +1,23 @@
 package dev.srello.cocinillas.recipe.service.transformer;
 
-import dev.srello.cocinillas.recipe.dto.*;
+import dev.srello.cocinillas.product.model.Product;
+import dev.srello.cocinillas.recipe.dto.RecipeIDTO;
+import dev.srello.cocinillas.recipe.dto.RecipeInteractionIDTO;
+import dev.srello.cocinillas.recipe.dto.RecipeInteractionODTO;
+import dev.srello.cocinillas.recipe.dto.RecipeODTO;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.model.RecipeInteraction;
-import dev.srello.cocinillas.storage.service.StorageService;
+import dev.srello.cocinillas.tags.model.Tag;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.net.URL;
 import java.util.List;
 
-import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.LIKE;
-import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.SAVE;
-import static java.util.Objects.nonNull;
+import static dev.srello.cocinillas.shared.enums.InteractionType.LIKE;
+import static dev.srello.cocinillas.shared.enums.InteractionType.SAVE;
 
 @Component
 @RequiredArgsConstructor
@@ -30,14 +34,7 @@ public class RecipeServiceTransformerImpl implements RecipeServiceTransformer {
         Boolean isLiked = filteredInteractions.stream().anyMatch(recipeInteractionODTO -> recipeInteractionODTO.getType().equals(LIKE));
         Boolean isSaved = filteredInteractions.stream().anyMatch(recipeInteractionODTO -> recipeInteractionODTO.getType().equals(SAVE));
 
-        RecipeAuthorODTO author = buildRecipeAuthor(recipe, userId);
-        return mapper.toRecipeODTO(recipe, imageUrls, isLiked, isSaved, author);
-    }
-
-    private RecipeAuthorODTO buildRecipeAuthor(Recipe recipe, Long userId) {
-        Boolean isUserAuthor = nonNull(userId) && userId.equals(recipe.getAuthor().getId());
-
-        return mapper.toRecipeAuthorODTO(recipe.getAuthor().getUsername(), isUserAuthor);
+        return mapper.toRecipeODTO(recipe, imageUrls, isLiked, isSaved, recipe.getAuthor(), userId);
     }
 
     @Override
@@ -51,8 +48,8 @@ public class RecipeServiceTransformerImpl implements RecipeServiceTransformer {
     }
 
     @Override
-    public Recipe toRecipe(@NonNull RecipeIDTO recipeIDTO) {
-        return mapper.toRecipe(recipeIDTO);
+    public Recipe toRecipe(@NonNull RecipeIDTO recipeIDTO, @NotNull List<Product> products, List<Tag> tags) {
+        return mapper.toRecipe(recipeIDTO, tags, products);
     }
 
 

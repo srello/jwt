@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.recipe.dto;
 
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,7 +12,7 @@ public class GetRecipesIDTO {
 
     private List<String> tags;
     private List<String> ingredients;
-    private RecipeVisibility visibility;
+    private Visibility visibility;
     private String name;
     private Long userId;
 }

@@ -16,7 +16,9 @@ public class Messages {
         public static final String USER_ADMIN_CANNOT_DELETE_OWN_ACCOUNT = "Admin cannot delete their own account";
         public static final String USER_WITH_THIS_EMAIL_EXISTS = "User with this email already exists";
         public static final String USER_NOT_AUTHENTICATED = "User not authenticated";
+        public static final String RESOURCE_ACCESS_NOT_ALLOWED = "User can not access this resource.";
         public static final String RESOURCE_DELETION_NOT_ALLOWED = "User can not delete this resource.";
+        public static final String RESOURCE_MODIFICATION_NOT_ALLOWED = "User can not modify this resource.";
         public static final String TOKEN_GENERATION_ERROR = "Error generating token. Try again later.";
         public static final String TOKEN_VALIDATION_ERROR = "Error generating token. Try again later.";
         public static final String TOKEN_INVALID = "Token invalid";
@@ -46,6 +48,11 @@ public class Messages {
 
         //MENUS
         public static final String MENU_NOT_FOUND = "Menu not found.";
+        public static final String MENU_INTERACTION_ALREADY_EXISTS = "Menu interaction already exists.";
+        public static final String MENU_INTERACTION_DOES_NOT_EXIST = "Menu interaction does not exist.";
+
+        //PRODUCTS
+        public static final String PRODUCT_NOT_FOUND = "Product not found.";
 
 
     }

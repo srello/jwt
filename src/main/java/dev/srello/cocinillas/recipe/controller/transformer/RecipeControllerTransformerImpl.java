@@ -58,4 +58,10 @@ public class RecipeControllerTransformerImpl implements RecipeControllerTransfor
     public RecipeIDTO toRecipeIDTO(@NonNull RecipeRQRDTO recipeRQRDTO, @NonNull UserODTO author) {
         return mapper.toRecipeIDTO(recipeRQRDTO, author);
     }
+
+    @Override
+    public EditRecipeIDTO toEditRecipeIDTO(@NonNull Long id, @NonNull RecipeRQRDTO recipeRQRDTO, @NonNull UserODTO author) {
+        RecipeIDTO recipeIDTO = mapper.toRecipeIDTO(recipeRQRDTO, author);
+        return mapper.toEditRecipeIDTO(id, recipeIDTO);
+    }
 }

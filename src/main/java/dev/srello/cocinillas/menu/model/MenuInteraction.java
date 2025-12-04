@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.menu.model;
 
-import dev.srello.cocinillas.menu.enums.MenuInteractionType;
+import dev.srello.cocinillas.shared.enums.InteractionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +28,5 @@ public class MenuInteraction {
     private Long menuId;
 
     @Column
-    private MenuInteractionType type;
+    private InteractionType type;
 }

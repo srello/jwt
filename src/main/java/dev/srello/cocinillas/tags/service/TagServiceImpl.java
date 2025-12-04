@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class TagServiceImpl implements TagService {
@@ -25,4 +27,11 @@ public class TagServiceImpl implements TagService {
         Page<Tag> tags = repository.findAll(specification, paginationIDTO.getPageRequest());
         return transformer.toTagsODTO(tags);
     }
+
+    @Override
+    public List<Tag> getTagsById(List<Long> tagIds) {
+        return repository.findAllById(tagIds);
+    }
+
+
 }

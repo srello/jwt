@@ -1,13 +1,18 @@
 package dev.srello.cocinillas.recipe.service.transformer;
 
+import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.service.transformer.ProductServiceMapper;
 import dev.srello.cocinillas.recipe.dto.*;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.model.RecipeInteraction;
+import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.tags.service.transformer.TagServiceMapper;
+import dev.srello.cocinillas.user.model.User;
+import dev.srello.cocinillas.user.service.transformer.UserServiceMapper;
 import org.jetbrains.annotations.NotNull;
+import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -16,9 +21,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.stream.Collector;
 
+import static dev.srello.cocinillas.core.codes.messages.Codes.Error.PRODUCT_NOT_FOUND_CODE;
+import static dev.srello.cocinillas.core.messages.Messages.Error.PRODUCT_NOT_FOUND;
 import static java.util.Optional.ofNullable;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 
-@Mapper(uses = {TagServiceMapper.class, ProductServiceMapper.class})
+@Mapper(uses = {TagServiceMapper.class, ProductServiceMapper.class, UserServiceMapper.class})
 public interface RecipeServiceMapper {
     Double CONVERSION_MACROS_MULTIPLIER = 0.01;
 
@@ -35,21 +43,23 @@ public interface RecipeServiceMapper {
         return accumulator1;
     }
 
+    @Mapping(target = "id", source = "recipe.id")
+    @Mapping(target = "name", source = "recipe.name")
     @Mapping(target = "macros", source = "recipe.ingredients", qualifiedByName = "getMacrosFromIngredients")
-    @Mapping(target = "author", source = "author")
-    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls, Boolean isLiked, Boolean isSaved, RecipeAuthorODTO author);
-
-    RecipeAuthorODTO toRecipeAuthorODTO(String username, Boolean isUserAuthor);
+    RecipeODTO toRecipeODTO(Recipe recipe, List<URL> imageUrls, Boolean isLiked, Boolean isSaved, User author, @Context Long userId);
 
     RecipeInteraction toRecipeInteraction(RecipeInteractionIDTO recipeInteractionIDTO);
 
     RecipeInteractionODTO toRecipeInteractionODTO(RecipeInteraction recipeInteraction);
 
-    @Mapping(target = "imageKeys", source = "images", qualifiedByName = "imagesToImageKeys")
-    Recipe toRecipe(RecipeIDTO recipeIDTO);
+    @Mapping(target = "imageKeys", source = "recipeIDTO.images", qualifiedByName = "imagesToImageKeys")
+    @Mapping(target = "ingredients", source = "recipeIDTO.ingredients", qualifiedByName = "buildRecipeIngredients")
+    @Mapping(target = "likes", constant = "0L")
+    Recipe toRecipe(RecipeIDTO recipeIDTO, List<Tag> tags, @Context List<Product> products);
 
-    @Mapping(target = "product", source = "productId", qualifiedByName = "productIdToProduct")
-    Ingredient toIngredient(IngredientIDTO ingredientIDTO);
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "product", source = "product")
+    Ingredient toIngredient(IngredientIDTO ingredientIDTO, Product product);
 
     @Named("getMacrosFromIngredients")
     default MacrosODTO getMacrosFromIngredients(List<Ingredient> ingredients) {
@@ -67,11 +77,18 @@ public interface RecipeServiceMapper {
                 );
     }
 
-    @Named("productIdToProduct")
-    default Product productIdToProduct(Long productId) {
-        return Product.builder()
-                .id(productId)
-                .build();
+    @Named("buildRecipeIngredients")
+    default List<Ingredient> buildRecipeIngredients(List<IngredientIDTO> ingredientIDTOS, @Context List<Product> products) {
+        return ingredientIDTOS.stream().map(ingredientIDTO ->
+                        toIngredient(ingredientIDTO, getProduct(products, ingredientIDTO)))
+                .toList();
+    }
+
+    private Product getProduct(List<Product> products, IngredientIDTO ingredientIDTO) {
+        return products.stream()
+                .filter(productODTO -> ingredientIDTO.getProductId().equals(productODTO.getId()))
+                .findFirst()
+                .orElseThrow(() -> new RequestException(NOT_FOUND, PRODUCT_NOT_FOUND, PRODUCT_NOT_FOUND_CODE));
     }
 
     @Named("imagesToImageKeys")

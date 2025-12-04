@@ -22,4 +22,6 @@ public interface RecipeService {
     RecipeODTO deleteRecipeById(DeleteRecipeIDTO deleteRecipeIDTO);
 
     RecipeODTO createRecipe(RecipeIDTO recipeIDTO);
+
+    RecipeODTO editRecipeById(EditRecipeIDTO editRecipeIDTO);
 }

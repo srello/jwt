@@ -1,12 +1,11 @@
-package dev.srello.cocinillas.recipe.enums;
+package dev.srello.cocinillas.shared.enums;
 
-import dev.srello.cocinillas.shared.enums.EnumMethods;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum RecipeVisibility implements EnumMethods {
+public enum Visibility implements EnumMethods {
     OFFICIAL(3),
     PUBLIC(2),
     PRIVATE(1);

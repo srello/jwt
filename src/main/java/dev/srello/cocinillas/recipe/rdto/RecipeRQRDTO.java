@@ -1,7 +1,7 @@
 package dev.srello.cocinillas.recipe.rdto;
 
 import dev.srello.cocinillas.core.validation.ValidContentTypes;
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import org.jetbrains.annotations.NotNull;
@@ -14,16 +14,16 @@ public record RecipeRQRDTO(
         @NotEmpty(message = "Description can not be empty.")
         String description,
         @NotNull("Ingredients can not be null or empty.")
-        List<Long> ingredientIds,
+        List<IngredientRQRDTO> ingredients,
         @NotNull("Instructions can not be null or empty.")
         List<@Valid InstructionRQRDTO> instructions,
-        @NotEmpty(message = "Visibility can not be empty.")
-        RecipeVisibility visibility,
+        @NotNull("Visibility can not be empty.")
+        Visibility visibility,
         List<Long> tagIds,
         @ValidContentTypes
         List<String> imageContentTypes,
-        @NotEmpty(message = "Total duration can not be empty.")
-        Integer totalDuration
+        @NotNull("Total duration can not be empty.")
+        Long totalDuration
 
 ) {
 }

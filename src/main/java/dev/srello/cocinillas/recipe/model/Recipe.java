@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.recipe.model;
 
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
@@ -38,16 +38,16 @@ public class Recipe {
     @OneToMany(fetch = EAGER, cascade = ALL, orphanRemoval = true)
     private List<Instruction> instructions;
 
-    @ManyToMany(fetch = EAGER)
+    @ManyToMany(fetch = EAGER, cascade = ALL)
     private List<Ingredient> ingredients;
 
     @Column
-    private RecipeVisibility visibility;
+    private Visibility visibility;
 
     @Column(nullable = false)
-    private Integer totalDuration;
+    private Long totalDuration;
 
-    @ManyToMany(cascade = {ALL}, fetch = EAGER)
+    @ManyToMany(fetch = EAGER)
     private List<Tag> tags;
 
     @ElementCollection(fetch = EAGER)
@@ -60,6 +60,9 @@ public class Recipe {
 
     @Column(nullable = false)
     private LocalDateTime creationDate;
+
+    @Column
+    private LocalDateTime lastUpdateDate;
 
     @Column
     private Long likes = 0L;

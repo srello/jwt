@@ -2,16 +2,12 @@ package dev.srello.cocinillas.recipe.service;
 
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.recipe.dto.GetRecipesIDTO;
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.model.RecipeInteraction;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -20,10 +16,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-import static dev.srello.cocinillas.recipe.enums.RecipeInteractionType.SAVE;
-import static dev.srello.cocinillas.recipe.enums.RecipeVisibility.*;
+import static dev.srello.cocinillas.shared.enums.InteractionType.SAVE;
+import static dev.srello.cocinillas.shared.enums.Visibility.*;
 import static jakarta.persistence.criteria.JoinType.LEFT;
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -35,7 +30,7 @@ public class RecipeSpecificationServiceImpl implements RecipeSpecificationServic
         Specification<Recipe> nameSpecification = ofNullable(getRecipesIDTO.getName()).map(this::nameContains).orElse(null);
         Specification<Recipe> productsSpecification = ofNullable(getRecipesIDTO.getIngredients()).map(this::productsContainsAll).orElse(null);
         Specification<Recipe> tagsSpecification = ofNullable(getRecipesIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
-        Specification<Recipe> visibilitySpecification = isInVisibilityNotPrivate(getRecipesIDTO.getVisibility());
+        Specification<Recipe> visibilitySpecification = visibilitySpecification(getRecipesIDTO.getVisibility(), getRecipesIDTO.getUserId());
 
         return Stream.of(nameSpecification, productsSpecification, tagsSpecification, visibilitySpecification)
                 .filter(Objects::nonNull)
@@ -115,19 +110,27 @@ public class RecipeSpecificationServiceImpl implements RecipeSpecificationServic
         };
     }
 
-    private Specification<Recipe> isInVisibilityNotPrivate(RecipeVisibility visibility) {
-
+    private Specification<Recipe> visibilitySpecification(Visibility visibility, Long userId) {
         return (recipeTable, query, criteriaBuilder) ->
         {
-            In<Integer> inClause = criteriaBuilder.in(recipeTable.get("visibility"));
-            if (nonNull(visibility) && !PRIVATE.equals(visibility))
-                inClause.value(visibility.getVisibilityValue());
-            else {
-                inClause.value(PUBLIC.getVisibilityValue());
-                inClause.value(OFFICIAL.getVisibilityValue());
-            }
+            Path<Visibility> recipeVisibilityPath = recipeTable.get("visibility");
+            Path<Long> authorId = recipeTable.get("author").get("id");
 
-            return inClause;
+            return switch (visibility) {
+                case PRIVATE -> criteriaBuilder.and(
+                        criteriaBuilder.equal(recipeVisibilityPath, visibility),
+                        criteriaBuilder.equal(authorId, userId)
+                );
+                case OFFICIAL, PUBLIC -> criteriaBuilder.equal(recipeVisibilityPath, visibility);
+                case null -> criteriaBuilder.or(
+                        criteriaBuilder.equal(recipeVisibilityPath, OFFICIAL),
+                        criteriaBuilder.equal(recipeVisibilityPath, PUBLIC),
+                        criteriaBuilder.and(
+                                criteriaBuilder.equal(recipeVisibilityPath, PRIVATE),
+                                criteriaBuilder.equal(authorId, userId)
+                        )
+                );
+            };
         };
     }
 }

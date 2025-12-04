@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.recipe.model;
 
-import dev.srello.cocinillas.recipe.enums.RecipeInteractionType;
+import dev.srello.cocinillas.shared.enums.InteractionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +28,5 @@ public class RecipeInteraction {
     private Long recipeId;
 
     @Column
-    private RecipeInteractionType type;
+    private InteractionType type;
 }

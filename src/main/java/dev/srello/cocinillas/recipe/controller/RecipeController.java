@@ -18,8 +18,6 @@ import org.springframework.web.bind.annotation.*;
 
 import static dev.srello.cocinillas.core.request.RequestConstants.*;
 import static dev.srello.cocinillas.recipe.controller.RecipeController.RECIPE_ROUTE;
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -27,7 +25,6 @@ import static org.springframework.http.ResponseEntity.ok;
 @RequestMapping(RECIPE_ROUTE)
 public class RecipeController {
     public static final String RECIPE_ROUTE = "/recipes";
-    public static final String INTERACTIONS_ROUTE = "/interactions";
 
     private final RecipeService service;
     private final RecipeControllerTransformer transformer;
@@ -62,11 +59,21 @@ public class RecipeController {
         return ok(recipeRSRDTO);
     }
 
-    @PostMapping(consumes = {APPLICATION_JSON_VALUE, MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<RecipeRSRDTO> createRecipe(@ModelAttribute @Valid RecipeRQRDTO recipeRQRDTO, @CurrentUser UserODTO userODTO) {
+    @PostMapping
+    public ResponseEntity<RecipeRSRDTO> createRecipe(@RequestBody @Valid RecipeRQRDTO recipeRQRDTO, @CurrentUser UserODTO userODTO) {
         RecipeIDTO recipeIDTO = transformer.toRecipeIDTO(recipeRQRDTO, userODTO);
         RecipeODTO recipeODTO = service.createRecipe(recipeIDTO);
         RecipeRSRDTO recipeRSRDTO = transformer.toRecipeRSRDTO(recipeODTO);
+        return ok(recipeRSRDTO);
+    }
+
+
+    @PutMapping(ID_PATH_VARIABLE)
+    public ResponseEntity<RecipeRSRDTO> editRecipeById(@PathVariable Long id, @RequestBody @Valid RecipeRQRDTO recipeRQRDTO, @CurrentUser UserODTO currentUser) {
+        EditRecipeIDTO editRecipeIDTO = transformer.toEditRecipeIDTO(id, recipeRQRDTO, currentUser);
+        RecipeODTO recipeODTO = service.editRecipeById(editRecipeIDTO);
+        RecipeRSRDTO recipeRSRDTO = transformer.toRecipeRSRDTO(recipeODTO);
+
         return ok(recipeRSRDTO);
     }
 
@@ -79,7 +86,7 @@ public class RecipeController {
         return ok(recipeRSRDTO);
     }
 
-    @PostMapping(INTERACTIONS_ROUTE)
+    @PostMapping(INTERACTIONS_PATH)
     public ResponseEntity<RecipeInteractionRSRDTO> createRecipeInteraction(@RequestBody RecipeInteractionRQRDTO recipeInteractionRQRDTO, @CurrentUser UserODTO currentUser) {
         RecipeInteractionIDTO recipeInteractionIDTO = transformer.toRecipeInteractionIDTO(recipeInteractionRQRDTO, currentUser.getId());
         RecipeInteractionODTO recipeInteractionODTO = service.createRecipeInteraction(recipeInteractionIDTO);
@@ -87,7 +94,7 @@ public class RecipeController {
         return ok(recipeInteractionRSRDTO);
     }
 
-    @DeleteMapping(INTERACTIONS_ROUTE)
+    @DeleteMapping(INTERACTIONS_PATH)
     public ResponseEntity<RecipeInteractionRSRDTO> deleteRecipeInteraction(@Valid RecipeInteractionRQRDTO recipeInteractionRQRDTO, @CurrentUser UserODTO currentUser) {
         RecipeInteractionIDTO recipeInteractionIDTO = transformer.toRecipeInteractionIDTO(recipeInteractionRQRDTO, currentUser.getId());
         RecipeInteractionODTO recipeInteractionODTO = service.deleteRecipeInteraction(recipeInteractionIDTO);

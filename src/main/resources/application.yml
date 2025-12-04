@@ -76,3 +76,4 @@ r2:
   bucket: ${R2_BUCKET:cocinillas-app}
   presigned-url-duration: ${R2_DURATION:5}
   region: ${R2_REGION:weur}
+  cache:

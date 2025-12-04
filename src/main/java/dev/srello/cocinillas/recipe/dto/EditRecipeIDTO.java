@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class RecipeAuthorODTO {
-    private String username;
-    private Boolean isUserAuthor;
+public class EditRecipeIDTO {
+    private Long id;
+    private RecipeIDTO recipeIDTO;
 }

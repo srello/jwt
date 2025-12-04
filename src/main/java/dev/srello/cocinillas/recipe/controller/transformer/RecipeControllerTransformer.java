@@ -24,4 +24,6 @@ public interface RecipeControllerTransformer {
     RecipeInteractionRSRDTO toRecipeInteractionRSRDTO(@NonNull RecipeInteractionODTO recipeInteractionODTO);
 
     RecipeIDTO toRecipeIDTO(@NonNull RecipeRQRDTO recipeRQRDTO, @NonNull UserODTO author);
+
+    EditRecipeIDTO toEditRecipeIDTO(@NonNull Long id, @NonNull RecipeRQRDTO recipeRQRDTO, @NonNull UserODTO author);
 }

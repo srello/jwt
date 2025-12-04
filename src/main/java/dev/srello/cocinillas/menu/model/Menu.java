@@ -1,6 +1,6 @@
 package dev.srello.cocinillas.menu.model;
 
-import dev.srello.cocinillas.menu.enums.MenuVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
@@ -30,6 +30,9 @@ public class Menu {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false, length = 3000)
+    private String description;
+
     @OneToMany(cascade = ALL, fetch = EAGER)
     private List<MenuMeal> menuMeals;
 
@@ -43,6 +46,6 @@ public class Menu {
     @Column
     private Long likes = 0L;
 
-    @Column
-    private MenuVisibility visibility;
+    @Column(nullable = false)
+    private Visibility visibility;
 }

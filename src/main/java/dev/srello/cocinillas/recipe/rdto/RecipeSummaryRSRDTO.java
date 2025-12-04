@@ -1,5 +1,7 @@
 package dev.srello.cocinillas.recipe.rdto;
 
+import dev.srello.cocinillas.user.rdto.AuthorRSRDTO;
+
 import java.util.List;
 
 public record RecipeSummaryRSRDTO(
@@ -12,7 +14,7 @@ public record RecipeSummaryRSRDTO(
         Long likes,
         Boolean isLiked,
         Boolean isSaved,
-        RecipeAuthorRSRDTO author
+        AuthorRSRDTO author
 
 ) {
 }

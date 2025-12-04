@@ -2,9 +2,11 @@ package dev.srello.cocinillas.product.model;
 
 import dev.srello.cocinillas.allergen.model.Allergen;
 import dev.srello.cocinillas.product.enums.ProductCategory;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.unit.enums.Unit;
 import dev.srello.cocinillas.unit.model.UnitConversion;
+import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +39,7 @@ public class Product {
     @Column(nullable = false)
     private Unit baseUnit;
 
-    @OneToMany(mappedBy = "product", fetch = EAGER)
+    @OneToMany(mappedBy = "product", fetch = EAGER, cascade = ALL)
     private List<UnitConversion> unitConversions;
 
     @Column
@@ -63,4 +65,11 @@ public class Product {
 
     @ManyToMany(cascade = {ALL}, fetch = EAGER)
     private List<Tag> tags;
+
+    @Column
+    private Visibility visibility;
+
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 }

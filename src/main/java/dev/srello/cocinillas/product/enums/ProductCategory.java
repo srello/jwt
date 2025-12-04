@@ -5,7 +5,7 @@ import dev.srello.cocinillas.shared.enums.EnumMethods;
 import java.util.Arrays;
 import java.util.List;
 
-import static dev.srello.cocinillas.product.enums.ProductCategory.Group.*;
+import static dev.srello.cocinillas.product.enums.ProductCategory.ProductGroup.*;
 
 public enum ProductCategory implements EnumMethods {
     // --- Food ---
@@ -65,23 +65,23 @@ public enum ProductCategory implements EnumMethods {
     DISPOSABLE_TABLEWARE(HOME),
     CANDLES_AND_CHARCOAL(HOME);
 
-    private final Group group;
+    private final ProductGroup productGroup;
 
-    ProductCategory(Group group) {
-        this.group = group;
+    ProductCategory(ProductGroup productGroup) {
+        this.productGroup = productGroup;
     }
 
-    public static List<ProductCategory> getByGroup(Group group) {
+    public static List<ProductCategory> getByGroup(ProductGroup productGroup) {
         return Arrays.stream(values())
-                .filter(c -> c.getGroup() == group)
+                .filter(c -> c.getGroup() == productGroup)
                 .toList();
     }
 
-    public Group getGroup() {
-        return group;
+    public ProductGroup getGroup() {
+        return productGroup;
     }
 
-    public enum Group {
+    public enum ProductGroup {
         FOOD,
         BABY,
         PERSONAL_CARE,

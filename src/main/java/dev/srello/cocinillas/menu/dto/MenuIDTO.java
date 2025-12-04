@@ -11,6 +11,7 @@ import java.util.List;
 @AllArgsConstructor
 public class MenuIDTO {
     private String name;
+    private String description;
     private List<MenuMealIDTO> menuMeals;
     private User author;
     private List<TagODTO> tags;

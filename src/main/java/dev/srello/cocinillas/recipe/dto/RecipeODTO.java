@@ -1,7 +1,8 @@
 package dev.srello.cocinillas.recipe.dto;
 
-import dev.srello.cocinillas.recipe.enums.RecipeVisibility;
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.dto.TagODTO;
+import dev.srello.cocinillas.user.dto.AuthorODTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -17,7 +18,7 @@ public class RecipeODTO {
     private String description;
     private List<IngredientODTO> ingredients;
     private List<InstructionODTO> instructions;
-    private RecipeVisibility visibility;
+    private Visibility visibility;
     private List<TagODTO> tags;
     private List<URL> imageUrls;
     private Integer totalDuration;
@@ -25,5 +26,5 @@ public class RecipeODTO {
     private Long likes;
     private Boolean isLiked;
     private Boolean isSaved;
-    private RecipeAuthorODTO author;
+    private AuthorODTO author;
 }

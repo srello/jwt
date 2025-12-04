@@ -6,9 +6,9 @@ import dev.srello.cocinillas.recipe.rdto.*;
 import dev.srello.cocinillas.shared.pagination.transformer.PaginationMapper;
 import dev.srello.cocinillas.tags.controller.transformer.TagControllerMapper;
 import dev.srello.cocinillas.user.dto.UserODTO;
-import jdk.jfr.Name;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -35,13 +35,17 @@ public interface RecipeControllerMapper {
     RecipeInteractionRSRDTO toRecipeInteractionsRSRDTO(RecipeInteractionODTO recipeInteractionODTO);
 
     @Mapping(target = "images", source = "recipeRQRDTO", qualifiedByName = "toRecipeImageIDTO")
+    @Mapping(target = "name", source = "recipeRQRDTO.name")
     RecipeIDTO toRecipeIDTO(RecipeRQRDTO recipeRQRDTO, UserODTO author);
+
+
+    EditRecipeIDTO toEditRecipeIDTO(Long id, RecipeIDTO recipeIDTO);
 
     default Page<RecipeSummaryRSRDTO> toRecipeSummaryRSRDTO(Page<RecipeODTO> recipesODTO) {
         return recipesODTO.map(this::toRecipeSummaryRSRDTO);
     }
 
-    @Name("toRecipeImageIDTO")
+    @Named("toRecipeImageIDTO")
     default List<RecipeImageIDTO> toRecipeImageIDTO(RecipeRQRDTO recipeRQRDTO) {
         return recipeRQRDTO.imageContentTypes().stream().map(imageContentType -> {
             String key = format("%s_%s", recipeRQRDTO.name(), randomUUID());
