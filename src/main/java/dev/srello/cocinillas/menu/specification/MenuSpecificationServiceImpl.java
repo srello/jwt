@@ -5,11 +5,7 @@ import dev.srello.cocinillas.menu.model.Menu;
 import dev.srello.cocinillas.menu.model.MenuInteraction;
 import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.model.Tag;
-import jakarta.persistence.criteria.CriteriaBuilder.In;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import jakarta.persistence.criteria.Subquery;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -19,9 +15,9 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 import static dev.srello.cocinillas.shared.enums.InteractionType.SAVE;
-import static dev.srello.cocinillas.shared.enums.Visibility.*;
+import static dev.srello.cocinillas.shared.enums.Visibility.OFFICIAL;
+import static dev.srello.cocinillas.shared.enums.Visibility.PUBLIC;
 import static jakarta.persistence.criteria.JoinType.LEFT;
-import static java.util.Objects.nonNull;
 import static java.util.Optional.ofNullable;
 
 
@@ -32,7 +28,7 @@ public class MenuSpecificationServiceImpl implements MenuSpecificationService {
     public Specification<Menu> buildMenusPaginatedSpecification(GetMenusIDTO getMenusIDTO) {
         Specification<Menu> nameSpecification = ofNullable(getMenusIDTO.getName()).map(this::nameContains).orElse(null);
         Specification<Menu> tagsSpecification = ofNullable(getMenusIDTO.getTags()).map(this::tagsContainsAll).orElse(null);
-        Specification<Menu> visibilitySpecification = isInVisibilityNotPrivate(getMenusIDTO.getVisibility());
+        Specification<Menu> visibilitySpecification = visibilitySpecification(getMenusIDTO.getVisibility());
 
         return Stream.of(nameSpecification, tagsSpecification, visibilitySpecification)
                 .filter(Objects::nonNull)
@@ -89,19 +85,18 @@ public class MenuSpecificationServiceImpl implements MenuSpecificationService {
         };
     }
 
-    private Specification<Menu> isInVisibilityNotPrivate(Visibility visibility) {
-
+    private Specification<Menu> visibilitySpecification(Visibility visibility) {
         return (menuTable, query, criteriaBuilder) ->
         {
-            In<Integer> inClause = criteriaBuilder.in(menuTable.get("visibility"));
-            if (nonNull(visibility) && !PRIVATE.equals(visibility))
-                inClause.value(visibility.getVisibilityValue());
-            else {
-                inClause.value(PUBLIC.getVisibilityValue());
-                inClause.value(OFFICIAL.getVisibilityValue());
-            }
+            Path<Visibility> menuVisibilityPath = menuTable.get("visibility");
 
-            return inClause;
+            return switch (visibility) {
+                case OFFICIAL, PUBLIC -> criteriaBuilder.equal(menuVisibilityPath, visibility);
+                case null, default -> criteriaBuilder.or(
+                        criteriaBuilder.equal(menuVisibilityPath, OFFICIAL),
+                        criteriaBuilder.equal(menuVisibilityPath, PUBLIC)
+                );
+            };
         };
     }
 }

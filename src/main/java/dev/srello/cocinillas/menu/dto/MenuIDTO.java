@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.menu.dto;
 
+import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.tags.dto.TagODTO;
 import dev.srello.cocinillas.user.model.User;
 import lombok.AllArgsConstructor;
@@ -15,4 +16,5 @@ public class MenuIDTO {
     private List<MenuMealIDTO> menuMeals;
     private User author;
     private List<TagODTO> tags;
+    private Visibility visibility;
 }
