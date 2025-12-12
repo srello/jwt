@@ -13,5 +13,5 @@ public interface ProductService {
 
     Page<ProductODTO> getUserProductsPaginated(GetProductsIDTO getProductsIDTO, PaginationIDTO paginationIDTO);
 
-    List<Product> getProductsByIds(List<Long> productIds, Long userId);
+    List<Product> getProductsByIds(List<Long> productIds);
 }

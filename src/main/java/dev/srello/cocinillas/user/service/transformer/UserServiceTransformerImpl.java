@@ -15,7 +15,7 @@ public class UserServiceTransformerImpl implements UserServiceTransformer {
 
     @Override
     public UserODTO toODTO(@NonNull User user) {
-        return userServiceMapper.toODTO(user);
+        return userServiceMapper.toUserODTO(user);
     }
 
     @Override

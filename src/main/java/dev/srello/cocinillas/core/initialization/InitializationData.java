@@ -13,6 +13,9 @@ import dev.srello.cocinillas.recipe.model.Instruction;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
 import dev.srello.cocinillas.shared.enums.Visibility;
+import dev.srello.cocinillas.shoppinglist.model.ShoppingList;
+import dev.srello.cocinillas.shoppinglist.model.ShoppingListItem;
+import dev.srello.cocinillas.shoppinglist.repository.ShoppingListRepository;
 import dev.srello.cocinillas.tags.model.Tag;
 import dev.srello.cocinillas.tags.repository.TagRepository;
 import dev.srello.cocinillas.unit.enums.Unit;
@@ -51,6 +54,7 @@ public class InitializationData {
     private final RecipeRepository recipeRepository;
     private final TagRepository tagRepository;
     private final MenuRepository menuRepository;
+    private final ShoppingListRepository shoppingListRepository;
     private final PasswordEncoder passwordEncoder;
     private final String[] devImageKeys = {"carbonara.png", "ensalada cesar.png", "paella.png", "reina pepiada.png", "verduras thai.jpg"};
     private final Map<String, LocalTime> mealNamesHours = Map.of(
@@ -73,7 +77,6 @@ public class InitializationData {
     private void createDbData() {
         if (!loadInitialData) return;
 
-
         List<User> users = userRepository.saveAllAndFlush(generateUsers());
 
         tagRepository.saveAllAndFlush(generateRandomTags());
@@ -86,6 +89,35 @@ public class InitializationData {
         recipeRepository.saveAllAndFlush(recipes);
 
         menuRepository.saveAllAndFlush(generateMenus(users, recipes));
+
+        shoppingListRepository.saveAllAndFlush(generateShoppingLists(products, users));
+    }
+
+    private Iterable<ShoppingList> generateShoppingLists(List<Product> products, List<User> users) {
+        List<ShoppingList> shoppingLists = new ArrayList<>();
+        for (int i = 0; i < 20; i++) {
+            LocalDateTime now = now();
+            LocalDateTime startDate = now.plusDays(7L * (i - 4));
+            User author = users.get(current().nextInt(0, users.size()));
+            shuffle(products);
+            List<ShoppingListItem> shoppingListItems = products.subList(0, current().nextInt(20, 40))
+                    .stream()
+                    .map(product -> ShoppingListItem.builder()
+                            .product(product)
+                            .checked(false)
+                            .quantity((double) current().nextInt(1, 5))
+                            .build())
+                    .toList();
+            ShoppingList shoppingList = ShoppingList.builder()
+                    .items(shoppingListItems)
+                    .startDate(startDate)
+                    .endDate(startDate.plusDays(7))
+                    .completed(false)
+                    .author(author)
+                    .build();
+            shoppingLists.add(shoppingList);
+        }
+        return shoppingLists;
     }
 
     private Iterable<Menu> generateMenus(List<User> users, List<Recipe> recipes) {

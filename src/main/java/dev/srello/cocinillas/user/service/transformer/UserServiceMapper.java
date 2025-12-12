@@ -13,7 +13,7 @@ import static java.util.Objects.nonNull;
 
 @Mapper
 public interface UserServiceMapper {
-    UserODTO toODTO(User user);
+    UserODTO toUserODTO(User user);
 
     User toUser(UserIDTO userIDTO);
 

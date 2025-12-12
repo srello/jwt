@@ -52,5 +52,8 @@ public class Codes {
         public static final String MENU_INTERACTION_DOES_NOT_EXIST_CODE = "035";
         //PRODUCTS
         public static final String PRODUCT_NOT_FOUND_CODE = "036";
+        //SHOPPING_LISTS
+        public static final String SHOPPING_LIST_NOT_FOUND_CODE = "037";
+        public static final String SHOPPING_LIST_ITEM_NOT_FOUND_CODE = "038";
     }
 }

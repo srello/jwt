@@ -78,7 +78,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public List<RecipeODTO> getRecipesById(GetRecipesByIdIDTO getRecipesByIdIDTO) {
-        List<Recipe> recipes = repository.findAllById(getRecipesByIdIDTO.getRecipeIds());
+        List<Recipe> recipes = getModelRecipesByIds(getRecipesByIdIDTO.getRecipeIds());
         Long userId = getRecipesByIdIDTO.getUserId();
         List<RecipeInteraction> recipeInteractions = getRecipeInteractionsList(recipes, userId);
         return recipes.stream()
@@ -162,6 +162,11 @@ public class RecipeServiceImpl implements RecipeService {
                 .toList();
         storageService.deleteObjects(keysToDelete);
         return transformer.toRecipeODTO(savedRecipe, emptyList(), imageUrls, savedRecipe.getAuthor().getId());
+    }
+
+    @Override
+    public List<Recipe> getModelRecipesByIds(List<Long> recipeIds) {
+        return repository.findAllById(recipeIds);
     }
 
     private Recipe getRecipeFromIDTO(RecipeIDTO recipeIDTO) {

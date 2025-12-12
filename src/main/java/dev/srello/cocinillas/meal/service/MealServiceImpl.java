@@ -57,10 +57,14 @@ public class MealServiceImpl implements MealService {
 
     @Override
     public List<MealODTO> getMeals(GetMealsIDTO getMealsIDTO) {
-        Long userId = getMealsIDTO.getUserId();
-        List<Meal> meals = repository.findByUserIdAndDateTimeBetweenOrderByDateTime(userId, getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
-        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(meals, userId);
+        List<Meal> meals = getModelMeals(getMealsIDTO);
+        List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(meals, getMealsIDTO.getUserId());
         return transformer.toMealsODTO(meals, recipes);
+    }
+
+    @Override
+    public List<Meal> getModelMeals(GetMealsIDTO getMealsIDTO) {
+        return repository.findByUserIdAndDateTimeBetweenOrderByDateTime(getMealsIDTO.getUserId(), getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
     }
 
     @Override

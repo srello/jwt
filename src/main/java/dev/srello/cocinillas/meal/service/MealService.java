@@ -1,6 +1,7 @@
 package dev.srello.cocinillas.meal.service;
 
 import dev.srello.cocinillas.meal.dto.*;
+import dev.srello.cocinillas.meal.model.Meal;
 
 import java.util.List;
 
@@ -12,6 +13,8 @@ public interface MealService {
     MealODTO deleteMeal(DeleteMealIDTO deleteMealIDTO);
 
     List<MealODTO> getMeals(GetMealsIDTO getMealsIDTO);
+
+    List<Meal> getModelMeals(GetMealsIDTO getMealsIDTO);
 
     List<MealODTO> deleteMeals(DeleteMealsIDTO deleteMealsIDTO);
 }
