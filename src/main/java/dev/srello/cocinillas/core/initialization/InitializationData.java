@@ -12,6 +12,7 @@ import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.recipe.model.Instruction;
 import dev.srello.cocinillas.recipe.model.Recipe;
 import dev.srello.cocinillas.recipe.repository.RecipeRepository;
+import dev.srello.cocinillas.settings.model.Settings;
 import dev.srello.cocinillas.shared.enums.Visibility;
 import dev.srello.cocinillas.shoppinglist.model.ShoppingList;
 import dev.srello.cocinillas.shoppinglist.model.ShoppingListItem;
@@ -105,6 +106,7 @@ public class InitializationData {
                     .map(product -> ShoppingListItem.builder()
                             .product(product)
                             .checked(false)
+                            .addedManually(current().nextBoolean())
                             .quantity((double) current().nextInt(1, 5))
                             .build())
                     .toList();
@@ -162,6 +164,7 @@ public class InitializationData {
                 .username("admin")
                 .name("Aname")
                 .surname("Asurname")
+                .settings(Settings.builder().defaultDiners(2).build())
                 .build();
         User user = User.builder()
                 .password(passwordEncoder.encode("1234Abc$"))
@@ -170,6 +173,7 @@ public class InitializationData {
                 .username("user")
                 .name("Uname")
                 .surname("Usurname")
+                .settings(Settings.builder().defaultDiners(4).build())
                 .build();
 
         return of(admin, user);

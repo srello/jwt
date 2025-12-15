@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.meal.model;
 
+import dev.srello.cocinillas.user.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,8 +28,9 @@ public class Meal {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = EAGER)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
     @ElementCollection(fetch = EAGER)
     @CollectionTable(
@@ -40,4 +42,7 @@ public class Meal {
 
     @Column(nullable = false)
     private LocalDateTime dateTime;
+
+    @Column(nullable = false)
+    private Integer diners;
 }

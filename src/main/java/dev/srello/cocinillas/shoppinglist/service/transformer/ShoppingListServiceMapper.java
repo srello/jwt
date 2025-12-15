@@ -3,7 +3,6 @@ package dev.srello.cocinillas.shoppinglist.service.transformer;
 import dev.srello.cocinillas.core.exception.custom.RequestException;
 import dev.srello.cocinillas.product.model.Product;
 import dev.srello.cocinillas.product.service.transformer.ProductServiceMapper;
-import dev.srello.cocinillas.recipe.dto.IngredientODTO;
 import dev.srello.cocinillas.recipe.model.Ingredient;
 import dev.srello.cocinillas.shoppinglist.dto.*;
 import dev.srello.cocinillas.shoppinglist.model.ShoppingList;
@@ -24,10 +23,6 @@ public interface ShoppingListServiceMapper {
     @Mapping(target = "author.id", source = "shoppingListIDTO.authorId")
     ShoppingList toShoppingList(ShoppingListIDTO shoppingListIDTO, List<ShoppingListItem> items);
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "checked", constant = "false")
-    ShoppingListItem toShoppingListItem(IngredientODTO ingredient);
-
     ShoppingListODTO toShoppingListODTO(ShoppingList shoppingList);
 
     ShoppingListSummaryODTO toShoppingListSummaryODTO(ShoppingList shoppingList);
@@ -35,11 +30,13 @@ public interface ShoppingListServiceMapper {
     ShoppingListItemODTO toShoppingListItemODTO(ShoppingListItem savedShoppingListItem);
 
     @Mapping(target = "checked", constant = "false")
+    @Mapping(target = "addedManually", constant = "true")
     @Mapping(target = "product", source = "item", qualifiedByName = "getProduct")
     ShoppingListItem toShoppingListItem(ShoppingListItemIDTO item, @Context List<Product> products);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "checked", constant = "false")
+    @Mapping(target = "addedManually", constant = "false")
     ShoppingListItem toShoppingListItem(Ingredient ingredient);
 
     @Named("getProduct")

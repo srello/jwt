@@ -69,4 +69,9 @@ public class ShoppingListControllerTransformerImpl implements ShoppingListContro
     public DeleteShoppingListItemIDTO toDeleteShoppingListItemIDTO(@NonNull Long shoppingListId, @NonNull Long itemId, @NonNull Long userId) {
         return mapper.toDeleteShoppingListItemIDTO(shoppingListId, itemId, userId);
     }
+
+    @Override
+    public RefreshShoppingListIDTO toRefreshShoppingListIDTO(@NonNull Long shoppingListId, @NotNull ShoppingListRQRDTO shoppingListRQRDTO, @NonNull Long userId) {
+        return mapper.toRefreshShoppingListIDTO(shoppingListId, shoppingListRQRDTO, userId);
+    }
 }

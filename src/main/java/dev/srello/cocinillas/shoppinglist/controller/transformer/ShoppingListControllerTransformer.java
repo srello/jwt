@@ -29,4 +29,6 @@ public interface ShoppingListControllerTransformer {
     AddShoppingListItemsIDTO toAddShoppingListItemIDTO(@NonNull AddShoppingListItemsRQRDTO addShoppingListItemsRQRDTO, @NonNull Long userId);
 
     DeleteShoppingListItemIDTO toDeleteShoppingListItemIDTO(@NonNull Long shoppingListId, @NonNull Long itemId, @NonNull Long userId);
+
+    RefreshShoppingListIDTO toRefreshShoppingListIDTO(@NonNull Long shoppingListId, @NonNull ShoppingListRQRDTO shoppingListRQRDTO, @NonNull Long userId);
 }

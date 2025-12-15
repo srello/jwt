@@ -4,6 +4,7 @@ import dev.srello.cocinillas.meal.adapter.transformer.MealServiceAdapterTransfor
 import dev.srello.cocinillas.meal.dto.GetMealsIDTO;
 import dev.srello.cocinillas.meal.model.Meal;
 import dev.srello.cocinillas.meal.service.MealService;
+import dev.srello.cocinillas.shoppinglist.dto.RefreshShoppingListIDTO;
 import dev.srello.cocinillas.shoppinglist.dto.ShoppingListIDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -19,6 +20,12 @@ public class MealServiceAdapterImpl implements MealServiceAdapter {
     @Override
     public List<Meal> getMealsFromShoppingList(ShoppingListIDTO shoppingListIDTO) {
         GetMealsIDTO getMealsIDTO = transformer.toGetMealsIDTO(shoppingListIDTO);
+        return mealService.getModelMeals(getMealsIDTO);
+    }
+
+    @Override
+    public List<Meal> getMealsFromShoppingList(RefreshShoppingListIDTO refreshShoppingListIDTO) {
+        GetMealsIDTO getMealsIDTO = transformer.toGetMealsIDTO(refreshShoppingListIDTO);
         return mealService.getModelMeals(getMealsIDTO);
     }
 }

@@ -24,4 +24,6 @@ public interface ShoppingListServiceTransformer {
     List<ShoppingListItemODTO> toShoppingListItemsODTO(@NonNull List<ShoppingListItem> savedShoppingListItems);
 
     List<ShoppingListItem> toShoppingListItems(@NonNull List<ShoppingListItemIDTO> shoppingListItemIDTO, @NonNull List<Product> products);
+
+    List<ShoppingListItem> toShoppingListItems(@NonNull List<Ingredient> ingredients);
 }

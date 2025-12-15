@@ -37,16 +37,6 @@ public class ShoppingListServiceImpl implements ShoppingListService {
     private final MealServiceAdapter mealServiceAdapter;
     private final RecipeServiceAdapter recipeServiceAdapter;
 
-    private static ShoppingListItem addQuantityOrNew(ShoppingListItem itemFromRQ, ShoppingList shoppingList) {
-        return shoppingList.getItems().stream().filter(item -> item.getProduct().getId().equals(itemFromRQ.getProduct().getId()))
-                .findFirst()
-                .map(item -> {
-                    item.setQuantity(item.getQuantity() + itemFromRQ.getQuantity());
-                    return item;
-                })
-                .orElse(itemFromRQ);
-    }
-
     @Override
     public ShoppingListSummaryODTO createShoppingList(ShoppingListIDTO shoppingListIDTO) {
         List<Meal> meals = mealServiceAdapter.getMealsFromShoppingList(shoppingListIDTO);
@@ -110,16 +100,10 @@ public class ShoppingListServiceImpl implements ShoppingListService {
             throw new RequestException(BAD_REQUEST, RESOURCE_MODIFICATION_NOT_ALLOWED, RESOURCE_MODIFICATION_NOT_ALLOWED_CODE);
 
         List<Product> products = productServiceAdapter.getProductsFromShoppingListItems(addShoppingListItemsIDTO.getItems());
-        List<ShoppingListItem> itemsFromRQ = transformer.toShoppingListItems(addShoppingListItemsIDTO.getItems(), products);
-        List<ShoppingListItem> originalItems = shoppingList.getItems().stream()
-                .filter(item -> products.stream().noneMatch(product -> item.getProduct().getId().equals(product.getId())))
-                .toList();
-        List<ShoppingListItem> shoppingListItems = itemsFromRQ.stream()
-                .map(itemFromRQ -> addQuantityOrNew(itemFromRQ, shoppingList))
-                .toList();
-        shoppingList.setItems(concat(shoppingListItems.stream(), originalItems.stream()).toList());
+        List<ShoppingListItem> newItems = transformer.toShoppingListItems(addShoppingListItemsIDTO.getItems(), products);
+        shoppingList.getItems().addAll(newItems);
         repository.saveAndFlush(shoppingList);
-        return transformer.toShoppingListItemsODTO(shoppingListItems);
+        return transformer.toShoppingListItemsODTO(shoppingList.getItems());
     }
 
     @Override
@@ -136,6 +120,23 @@ public class ShoppingListServiceImpl implements ShoppingListService {
 
         shoppingListItemRepository.delete(shoppingListItem);
         return transformer.toShoppingListItemODTO(shoppingListItem);
+    }
+
+    @Override
+    public ShoppingListODTO refreshShoppingList(RefreshShoppingListIDTO refreshShoppingListIDTO) {
+        ShoppingList shoppingList = getShoppingListById(refreshShoppingListIDTO.getShoppingListId());
+
+        if (!shoppingList.getAuthor().getId().equals(refreshShoppingListIDTO.getUserId()))
+            throw new RequestException(BAD_REQUEST, RESOURCE_MODIFICATION_NOT_ALLOWED, RESOURCE_MODIFICATION_NOT_ALLOWED_CODE);
+
+        List<Meal> meals = mealServiceAdapter.getMealsFromShoppingList(refreshShoppingListIDTO);
+        List<Ingredient> ingredients = recipeServiceAdapter.getIngredientsFromMeals(meals);
+        List<ShoppingListItem> generatedItems = transformer.toShoppingListItems(ingredients);
+        List<ShoppingListItem> manuallyAddedItems = shoppingList.getItems().stream().filter(ShoppingListItem::getAddedManually).toList();
+        shoppingList.setItems(concat(generatedItems.stream(), manuallyAddedItems.stream()).toList());
+        ShoppingList savedShoppingList = repository.saveAndFlush(shoppingList);
+
+        return transformer.toShoppingListODTO(savedShoppingList);
     }
 
     private ShoppingList getShoppingListById(Long id) {

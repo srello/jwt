@@ -55,4 +55,9 @@ public class ShoppingListServiceTransformerImpl implements ShoppingListServiceTr
                 .map(item -> mapper.toShoppingListItem(item, products))
                 .toList();
     }
+
+    @Override
+    public List<ShoppingListItem> toShoppingListItems(@NonNull List<Ingredient> ingredients) {
+        return ingredients.stream().map(mapper::toShoppingListItem).toList();
+    }
 }

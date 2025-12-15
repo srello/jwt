@@ -33,7 +33,7 @@ public class MealServiceImpl implements MealService {
         Meal meal = transformer.toMeal(mealIDTO);
         Meal savedMeal = repository.saveAndFlush(meal);
         List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(of(meal), mealIDTO.getUserId());
-        return transformer.toMealODTO(savedMeal, recipes);
+        return transformer.toMealODTO(savedMeal, recipes, mealIDTO.getUserId());
     }
 
     @Override
@@ -44,34 +44,34 @@ public class MealServiceImpl implements MealService {
         List<Meal> meals = transformer.toMeals(mealsIDTO);
         List<Meal> savedMeals = repository.saveAllAndFlush(meals);
         List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(savedMeals, mealsIDTO.getFirst().getUserId());
-        return transformer.toMealsODTO(savedMeals, recipes);
+        return transformer.toMealsODTO(savedMeals, recipes, mealsIDTO.getFirst().getUserId());
     }
 
     @Override
     public MealODTO deleteMeal(DeleteMealIDTO deleteMealIDTO) {
-        Meal meal = repository.findByIdAndUserId(deleteMealIDTO.getMealId(), deleteMealIDTO.getUserId())
+        Meal meal = repository.findByIdAndAuthorId(deleteMealIDTO.getMealId(), deleteMealIDTO.getUserId())
                 .orElseThrow(() -> new RequestException(NOT_FOUND, MEAL_NOT_FOUND, MEAL_NOT_FOUND_CODE));
         repository.delete(meal);
-        return transformer.toMealODTO(meal);
+        return transformer.toMealODTO(meal, deleteMealIDTO.getUserId());
     }
 
     @Override
     public List<MealODTO> getMeals(GetMealsIDTO getMealsIDTO) {
         List<Meal> meals = getModelMeals(getMealsIDTO);
         List<RecipeODTO> recipes = recipeServiceAdapter.getRecipesFromMeals(meals, getMealsIDTO.getUserId());
-        return transformer.toMealsODTO(meals, recipes);
+        return transformer.toMealsODTO(meals, recipes, getMealsIDTO.getUserId());
     }
 
     @Override
     public List<Meal> getModelMeals(GetMealsIDTO getMealsIDTO) {
-        return repository.findByUserIdAndDateTimeBetweenOrderByDateTime(getMealsIDTO.getUserId(), getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
+        return repository.findByAuthorIdAndDateTimeBetweenOrderByDateTime(getMealsIDTO.getUserId(), getMealsIDTO.getStartDateTime(), getMealsIDTO.getEndDateTime());
     }
 
     @Override
     public List<MealODTO> deleteMeals(DeleteMealsIDTO deleteMealsIDTO) {
         Long userId = deleteMealsIDTO.getUserId();
-        List<Meal> meals = repository.findByUserIdAndDateTimeBetween(userId, deleteMealsIDTO.getStartDateTime(), deleteMealsIDTO.getEndDateTime());
+        List<Meal> meals = repository.findByAuthorIdAndDateTimeBetween(userId, deleteMealsIDTO.getStartDateTime(), deleteMealsIDTO.getEndDateTime());
         repository.deleteAll(meals);
-        return transformer.toMealsODTO(meals, emptyList());
+        return transformer.toMealsODTO(meals, emptyList(), deleteMealsIDTO.getUserId());
     }
 }

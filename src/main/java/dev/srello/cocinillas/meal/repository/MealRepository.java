@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MealRepository extends JpaRepository<Meal, Long> {
-    List<Meal> findByUserIdAndDateTimeBetweenOrderByDateTime(Long userId, LocalDateTime start, LocalDateTime end);
+    List<Meal> findByAuthorIdAndDateTimeBetweenOrderByDateTime(Long userId, LocalDateTime start, LocalDateTime end);
 
-    List<Meal> findByUserIdAndDateTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
+    List<Meal> findByAuthorIdAndDateTimeBetween(Long userId, LocalDateTime start, LocalDateTime end);
 
-    Optional<Meal> findByIdAndUserId(Long id, Long userId);
+    Optional<Meal> findByIdAndAuthorId(Long id, Long userId);
 
 }

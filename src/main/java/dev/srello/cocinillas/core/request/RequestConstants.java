@@ -8,6 +8,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class RequestConstants {
     public static final String AUTHORIZATION_REQUEST_ATTRIBUTE = "Authorization";
     public static final String REFRESH_REQUEST_ATTRIBUTE = "Refresh";
+    public static final String REFRESH_PATH_VARIABLE = "/refresh";
     public static final String ENDPOINT_ATTRIBUTE = "endpoint";
     public static final String ID_PATH_VARIABLE = "/{id:[0-9]+}";
     public static final String MULTIPLE_PATH_VARIABLE = "/multiple";

@@ -27,4 +27,8 @@ public interface ShoppingListControllerMapper {
     AddShoppingListItemsIDTO toAddShoppingListItemIDTO(AddShoppingListItemsRQRDTO addShoppingListItemsRQRDTO, Long userId);
 
     DeleteShoppingListItemIDTO toDeleteShoppingListItemIDTO(Long shoppingListId, Long itemId, Long userId);
+
+    @Mapping(target = "startDate", source = "shoppingListRQRDTO.startDate")
+    @Mapping(target = "endDate", source = "shoppingListRQRDTO.endDate")
+    RefreshShoppingListIDTO toRefreshShoppingListIDTO(Long shoppingListId, ShoppingListRQRDTO shoppingListRQRDTO, Long userId);
 }

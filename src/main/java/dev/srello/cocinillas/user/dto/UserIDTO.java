@@ -1,5 +1,6 @@
 package dev.srello.cocinillas.user.dto;
 
+import dev.srello.cocinillas.settings.dto.SettingsIDTO;
 import dev.srello.cocinillas.user.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,4 +16,5 @@ public class UserIDTO {
     private String name;
     private String surname;
     private Role role;
+    private SettingsIDTO settings;
 }

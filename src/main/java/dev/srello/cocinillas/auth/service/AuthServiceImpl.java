@@ -12,6 +12,7 @@ import dev.srello.cocinillas.core.messages.Messages;
 import dev.srello.cocinillas.email.service.EmailService;
 import dev.srello.cocinillas.jwt.enums.JwtValidity;
 import dev.srello.cocinillas.jwt.service.JwtService;
+import dev.srello.cocinillas.settings.dto.SettingsIDTO;
 import dev.srello.cocinillas.token.service.TokenService;
 import dev.srello.cocinillas.user.dto.UserIDTO;
 import dev.srello.cocinillas.user.dto.UserODTO;
@@ -84,6 +85,7 @@ public class AuthServiceImpl implements AuthService {
         } catch (RequestException requestException) {
             //ignored
             UserIDTO userIDTO = authServiceTransformer.toUserIDTO(registerIDTO);
+            userIDTO.setSettings(new SettingsIDTO(1));
             userIDTO.setPassword(passwordEncoder.encode(userIDTO.getPassword()));
             UserODTO userODTO = userService.createUser(userIDTO);
 

@@ -12,6 +12,8 @@ public record MealRQRDTO(
         @NotNull("Recipes are required")
         List<Long> recipeIds,
         @NotNull(value = "Date time is required")
-        LocalDateTime dateTime
+        LocalDateTime dateTime,
+        @NotNull(value = "Diners is required")
+        Integer diners
 ) {
 }

@@ -1,6 +1,7 @@
 package dev.srello.cocinillas.meal.dto;
 
 import dev.srello.cocinillas.recipe.dto.RecipeODTO;
+import dev.srello.cocinillas.user.dto.AuthorODTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -15,4 +16,6 @@ public class MealODTO {
     private Long userId;
     private List<RecipeODTO> recipes;
     private LocalDateTime dateTime;
+    private Integer diners;
+    private AuthorODTO author;
 }

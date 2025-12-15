@@ -5,6 +5,7 @@ import dev.srello.cocinillas.meal.dto.MealODTO;
 import dev.srello.cocinillas.meal.model.Meal;
 import dev.srello.cocinillas.recipe.dto.RecipeODTO;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,29 +21,29 @@ public class MealServiceTransformerImpl implements MealServiceTransformer {
     }
 
     @Override
-    public Meal toMeal(MealIDTO mealIDTO) {
+    public Meal toMeal(@NotNull MealIDTO mealIDTO) {
         return mapper.toMeal(mealIDTO);
     }
 
     @Override
-    public List<Meal> toMeals(List<MealIDTO> mealsIDTO) {
+    public List<Meal> toMeals(@NotNull List<MealIDTO> mealsIDTO) {
         return mealsIDTO.stream().map(this::toMeal).toList();
     }
 
     @Override
-    public MealODTO toMealODTO(Meal meal, List<RecipeODTO> recipes) {
-        return mapper.toMealODTO(meal, recipes);
+    public MealODTO toMealODTO(@NotNull Meal meal, @NotNull List<RecipeODTO> recipes, @NotNull Long userId) {
+        return mapper.toMealODTO(meal, recipes, userId);
     }
 
     @Override
-    public MealODTO toMealODTO(Meal meal) {
-        return mapper.toMealODTO(meal);
+    public MealODTO toMealODTO(@NotNull Meal meal, @NotNull Long userId) {
+        return mapper.toMealODTO(meal, userId);
     }
 
     @Override
-    public List<MealODTO> toMealsODTO(List<Meal> meals, List<RecipeODTO> recipeODTOS) {
+    public List<MealODTO> toMealsODTO(@NotNull List<Meal> meals, @NotNull List<RecipeODTO> recipeODTOS, @NotNull Long userId) {
         return meals.stream()
-                .map(meal -> toMealODTO(meal, findRecipes(meal, recipeODTOS)))
+                .map(meal -> toMealODTO(meal, findRecipes(meal, recipeODTOS), userId))
                 .toList();
     }
 }

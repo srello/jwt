@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static dev.srello.cocinillas.core.request.RequestConstants.ID_PATH_VARIABLE;
+import static dev.srello.cocinillas.core.request.RequestConstants.REFRESH_PATH_VARIABLE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @Controller
@@ -85,6 +86,14 @@ public class ShoppingListController {
         ShoppingListItemODTO shoppingListItemODTO = service.deleteShoppingListItem(deleteShoppingListItemIDTO);
         ShoppingListItemRSRDTO shoppingListItemRSRDTO = transformer.toShoppingListItemRSRDTO(shoppingListItemODTO);
         return ok(shoppingListItemRSRDTO);
+    }
+
+    @PatchMapping(ID_PATH_VARIABLE + REFRESH_PATH_VARIABLE)
+    public ResponseEntity<ShoppingListRSRDTO> refreshShoppingList(@PathVariable Long id, @RequestBody ShoppingListRQRDTO shoppingListRQRDTO, @CurrentUser UserODTO currentUser) {
+        RefreshShoppingListIDTO refreshShoppingListIDTO = transformer.toRefreshShoppingListIDTO(id, shoppingListRQRDTO, currentUser.getId());
+        ShoppingListODTO shoppingListODTO = service.refreshShoppingList(refreshShoppingListIDTO);
+        ShoppingListRSRDTO shoppingListRSRDTO = transformer.toShoppingListRSRDTO(shoppingListODTO);
+        return ok(shoppingListRSRDTO);
     }
 
 }

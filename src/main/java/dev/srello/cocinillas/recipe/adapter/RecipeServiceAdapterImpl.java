@@ -14,6 +14,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 
 @Component
 @RequiredArgsConstructor
@@ -53,21 +57,35 @@ public class RecipeServiceAdapterImpl implements RecipeServiceAdapter {
 
     @Override
     public List<Ingredient> getIngredientsFromMeals(List<Meal> meals) {
-        List<Recipe> recipes = getRecipesFromMeals(meals);
-        List<Ingredient> ingredients = recipes.stream().map(Recipe::getIngredients)
+        List<Ingredient> ingredients = meals.stream()
+                .map(this::getIngredientsFromMeal)
                 .flatMap(Collection::stream)
                 .toList();
 
-        return ingredients.stream().distinct()
+        Map<Long, Ingredient> uniqueIngredients = ingredients.stream()
+                .collect(toMap(
+                        Ingredient::getId,
+                        identity(),
+                        (existing, replacement) -> existing
+                ));
+
+        return uniqueIngredients.values().stream()
                 .map(ingredient -> sumIngredientQuantities(ingredient, ingredients))
                 .toList();
     }
 
-    private List<Recipe> getRecipesFromMeals(List<Meal> meals) {
-        List<Long> recipeIds = meals.stream().map(Meal::getRecipeIds)
-                .flatMap(Collection::stream)
+    private List<Ingredient> getIngredientsFromMeal(Meal meal) {
+        List<Recipe> recipes = recipeService.getModelRecipesByIds(meal.getRecipeIds());
+
+        return recipes.stream()
+                .flatMap(recipe -> recipe.getIngredients().stream())
+                .map(ingredient -> getIngredientPerDiners(ingredient, meal.getDiners()))
                 .toList();
-        return recipeService.getModelRecipesByIds(recipeIds);
+    }
+
+    private Ingredient getIngredientPerDiners(Ingredient ingredient, Integer diners) {
+        ingredient.setQuantity(ingredient.getQuantity() * diners);
+        return ingredient;
     }
 
     private List<RecipeODTO> getRecipesById(List<Long> recipeIds, Long userId) {

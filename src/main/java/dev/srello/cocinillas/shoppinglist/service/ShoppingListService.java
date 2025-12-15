@@ -20,4 +20,6 @@ public interface ShoppingListService {
     List<ShoppingListItemODTO> addItemsToShoppingList(AddShoppingListItemsIDTO addShoppingListItemsIDTO);
 
     ShoppingListItemODTO deleteShoppingListItem(DeleteShoppingListItemIDTO deleteShoppingListItemIDTO);
+
+    ShoppingListODTO refreshShoppingList(RefreshShoppingListIDTO refreshShoppingListIDTO);
 }

@@ -29,6 +29,9 @@ public class ShoppingListItem {
     @Column
     private Double quantity;
 
-    @Column
-    private Boolean checked;
+    @Column(nullable = false)
+    private Boolean checked = false;
+
+    @Column(nullable = false)
+    private Boolean addedManually = false;
 }

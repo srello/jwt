@@ -13,4 +13,5 @@ public class MealIDTO {
     private Long userId;
     private List<Long> recipeIds;
     private LocalDateTime dateTime;
+    private Integer diners;
 }
