@@ -55,7 +55,7 @@ class AuthControllerTest extends BaseTestClass {
         UserODTO userODTO = generateData(UserODTO.class);
         doNothing().when(authService).logout(userODTO, response);
 
-        ResponseEntity<Void> result = authController.logout(userODTO, response);
+        ResponseEntity<String> result = authController.logout(userODTO, response);
 
 
         assertEquals(OK, result.getStatusCode());

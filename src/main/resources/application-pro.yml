@@ -1,0 +1,26 @@
+spring:
+  # ---- DB ----
+  datasource:
+    hikari:
+      connectionTimeout: 20000
+      maximumPoolSize: 5
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://db:5432/${DB_NAME:cocinillas-db}
+    username: ${DB_USER}
+    password: ${DB_PASS}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: ${DB_START_MODE:none}
+    properties:
+      hibernate:
+        format_sql: false # true for format the queries (requires show_sql to true)
+        show_sql: false
+    defer-datasource-initialization: true # load schema from entities
+    show-sql: false # show sql queries formatted (true for formatted, requires spring.jpa.properties.hibernate.show_sql and spring.jpa.properties.hibernate.format_sql)
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
