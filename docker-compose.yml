@@ -35,7 +35,7 @@ services:
     image: openjdk:24-jdk-slim
     #build:
     #  context: ./
-    #  dockerfile: Dockerfile
+    #  dockerfile: Dockerfile-backend-frontend
     volumes:
       - ./target:/opt/app
     working_dir: /opt/app
